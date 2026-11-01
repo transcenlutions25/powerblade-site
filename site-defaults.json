@@ -1,0 +1,107 @@
+{
+ "heroBadge": "Making Lawns Loveable",
+ "heroTitle": "Give your lawn a powerup with PowerBlade",
+ "heroText": "Expert lawn care and landscaping for homes and businesses across Gallatin, Hendersonville and Greater Nashville.",
+ "heroImg": "https://powerbladelawncare.com/wp-content/uploads/2024/01/senior-african-american-couple-spending-time-in-ga.jpg",
+ "bannerServices": "https://powerbladelawncare.com/wp-content/uploads/2024/01/row-of-traditional-suburban-homes-with-lush-green-front-lawns-in-nice-residential-neighborhood.jpg",
+ "bannerQuote": "https://powerbladelawncare.com/wp-content/uploads/2024/04/gardener-mowing-grass-and-cleaning-backyard-garden.jpg",
+ "bannerContact": "https://powerbladelawncare.com/wp-content/uploads/2024/04/modern-house-with-beauty-garden.jpg",
+ "services": [
+  {
+   "name": "Lawn Mowing & Trimming",
+   "desc": "Consistent mowing and precise edging for a crisp, clean lawn that stands out.",
+   "img": "https://powerbladelawncare.com/wp-content/uploads/2024/04/gardener-mowing-grass-and-cleaning-backyard-garden-1536x1024.jpg"
+  },
+  {
+   "name": "Leaf Removal & Mulching",
+   "desc": "Clear the leaves and debris and feed your soil so the yard stays healthy every season.",
+   "img": "https://powerbladelawncare.com/wp-content/uploads/2024/04/fallen-leaves-near-houses-are-being-cleaned-by-a-municipal-worker-in-the-autumn--1536x1025.jpg"
+  },
+  {
+   "name": "Hedge Trimming",
+   "desc": "Hedges carefully shaped to sharpen the look of your whole yard.",
+   "img": "https://powerbladelawncare.com/wp-content/uploads/2024/04/cutting-bushes-with-hedge-trimmer-gardener-is-trimming-branches-1536x1008.jpg"
+  },
+  {
+   "name": "Gutter Cleaning",
+   "desc": "Debris cleared out so water drains properly and your home stays protected.",
+   "img": "https://powerbladelawncare.com/wp-content/uploads/2024/04/rain-gutters-pressure-cleaning-1536x1025.jpg"
+  },
+  {
+   "name": "Landscaping",
+   "desc": "From design to installation, we turn your outdoor space into the yard you picture.",
+   "img": "https://powerbladelawncare.com/wp-content/uploads/2024/04/colorful-garden-landscape-and-grassy-lawn-1536x1025.jpg"
+  },
+  {
+   "name": "Pressure Washing",
+   "desc": "Years of dirt and grime lifted off siding, walks and drives.",
+   "img": "https://powerbladelawncare.com/wp-content/uploads/2024/04/house-front-washing-cleaning-with-high-pressure-water-blaster-1536x1024.jpg"
+  },
+  {
+   "name": "Tree Trimming",
+   "desc": "Pruning that keeps trees healthy and good looking.",
+   "img": "https://powerbladelawncare.com/wp-content/uploads/2024/01/hastings-house-lawn.jpg"
+  },
+  {
+   "name": "Tree & Brush Removal",
+   "desc": "Unwanted trees and overgrowth cleared for a safer, cleaner property.",
+   "img": "https://powerbladelawncare.com/wp-content/uploads/2024/04/on-the-lawn.jpg"
+  },
+  {
+   "name": "Aeration & Seeding",
+   "desc": "Loosen compacted soil and seed for thicker, greener grass.",
+   "img": "https://powerbladelawncare.com/wp-content/uploads/2024/04/lawn-aerator-job-for-controlling-lawn-thatch-and-soil-compaction.jpg"
+  },
+  {
+   "name": "Mulch Application",
+   "desc": "Fresh mulch to hold moisture, block weeds and finish your beds.",
+   "img": "https://powerbladelawncare.com/wp-content/uploads/2024/04/modern-house-with-beauty-garden.jpg"
+  },
+  {
+   "name": "Sod Installation",
+   "desc": "New sod for an instantly green lawn.",
+   "img": "https://powerbladelawncare.com/wp-content/uploads/2024/01/hastings-house-lawn.jpg"
+  },
+  {
+   "name": "Junk Removal",
+   "desc": "We haul away the stuff you're done with.",
+   "img": "https://powerbladelawncare.com/wp-content/uploads/2024/01/row-of-traditional-suburban-homes-with-lush-green-front-lawns-in-nice-residential-neighborhood.jpg"
+  }
+ ],
+ "areas": [
+  "Gallatin",
+  "Hendersonville",
+  "Nashville",
+  "Goodlettsville",
+  "Madison",
+  "White House",
+  "Portland",
+  "Mount Juliet"
+ ],
+ "hours": [
+  null,
+  [
+   9,
+   17
+  ],
+  [
+   9,
+   17
+  ],
+  [
+   9,
+   17
+  ],
+  [
+   9,
+   17
+  ],
+  [
+   9,
+   13
+  ],
+  null
+ ],
+ "phone": "(615) 587-2226",
+ "email": "PowerBladeLawncare@gmail.com"
+}

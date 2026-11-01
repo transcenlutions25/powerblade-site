@@ -1,0 +1,1000 @@
+<title>PowerBlade Owner Panel</title>
+<meta name="robots" content="noindex">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png">
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#31572C">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@500;700;800&family=Roboto:wght@400;500;700&display=swap">
+<style>
+/* Layout: one-column field app — PowerBlade green header, scrolling cards, 5-tab thumb bar; brand: green #31572C, navy #192A3D, gold #FCB816 */
+:root{
+  --bg:#f4f4f4; --surface:#fff; --fg:#192a3d; --muted:#444f5c; --line:#d3d8dd;
+  --turf:#31572c; --turf-ink:#fff; --blade:#fcb816; --blade-ink:#192a3d; --navy:#192a3d;
+  --ok:#31572c; --warn:#9a5600; --due:#b3261e; --exp:#8a5a12;
+  --f-display:"Jost","Trebuchet MS",Arial,sans-serif;
+  --f-body:"Roboto",system-ui,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1a26; --surface:#192a3d; --fg:#f1f4f7; --muted:#b8c3cf; --line:#2c4058;
+  --turf:#5e9a55; --turf-ink:#08140a; --blade:#fcb816; --blade-ink:#192a3d; --navy:#0b1520;
+  --ok:#8fd184; --warn:#ffbe5c; --due:#ff8a80; --exp:#f2b866; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1a26; --surface:#192a3d; --fg:#f1f4f7; --muted:#b8c3cf; --line:#2c4058;
+  --turf:#5e9a55; --turf-ink:#08140a; --blade:#fcb816; --blade-ink:#192a3d; --navy:#0b1520;
+  --ok:#8fd184; --warn:#ffbe5c; --due:#ff8a80; --exp:#f2b866; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font:400 19px/1.45 var(--f-body)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--turf)}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));max-width:760px;margin:0 auto;box-sizing:border-box}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--turf);color:var(--turf-ink)}
+header .wrap{display:flex;align-items:center;gap:12px;padding-block:10px}
+.logochip{background:#fff;border-radius:8px;padding:5px 8px;flex:none;display:flex;align-items:center;border-bottom:3px solid var(--blade)}
+.logochip img{height:30px;width:auto;display:block}
+.logochip .wordmark{display:none;font:800 italic 22px/1 var(--f-display);letter-spacing:.02em}
+.logochip .wordmark b{color:#192a3d}.logochip .wordmark i{color:#fcb816;-webkit-text-stroke:1px #192a3d}
+.logochip.nologo img{display:none}.logochip.nologo .wordmark{display:block}
+h1{font:700 24px/1 var(--f-display);letter-spacing:.01em;margin:0;flex:1;min-width:0;text-align:right}
+h1 small{display:block;font:600 14px/1.2 var(--f-body);letter-spacing:.08em;opacity:.9}
+main{padding-block:16px calc(120px + env(safe-area-inset-bottom,0px))}
+h2{font:800 28px/1.1 var(--f-display);text-transform:uppercase;margin:22px 0 10px;letter-spacing:.02em;text-wrap:balance}
+h3{font:700 19px/1.2 var(--f-body);margin:8px 0 4px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:14px}
+.stat{background:var(--surface);border:2px solid var(--line);border-radius:10px;padding:10px}
+.stat b{display:block;font:800 30px/1 var(--f-display);font-variant-numeric:tabular-nums}
+.stat span{font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.stat.alert{border-color:var(--due)}
+.list{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.card.example{border-style:dashed}
+.card.running{border-color:var(--blade);box-shadow:0 0 0 2px var(--blade) inset}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.grow{flex:1;min-width:0}
+.name{font:700 21px/1.2 var(--f-body);overflow-wrap:anywhere}
+.sub{color:var(--muted);font-size:17px;overflow-wrap:anywhere}
+.price{font:800 28px/1 var(--f-display);font-variant-numeric:tabular-nums}
+.pill{font:700 14px/1 var(--f-body);text-transform:uppercase;letter-spacing:.06em;padding:7px 10px;border-radius:99px;border:2px solid currentColor;white-space:nowrap}
+.pill.scheduled{color:var(--warn)} .pill.done{color:var(--due)} .pill.paid{color:var(--ok)} .pill.lead{color:var(--warn)} .pill.due{color:var(--due)}
+.tag{font-size:14px;font-weight:700;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:3px 7px}
+button,.btn{font:700 18px/1 var(--f-body);min-height:52px;padding:0 16px;border-radius:10px;border:2px solid var(--fg);background:var(--surface);color:var(--fg);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;box-sizing:border-box}
+.primary{background:var(--blade);color:var(--blade-ink);border-color:var(--blade)}
+.go{background:var(--turf);color:var(--turf-ink);border-color:var(--turf)}
+button.small,.btn.small{min-height:46px;font-size:16px;padding:0 12px}
+button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+button:disabled{opacity:.5}
+:focus-visible{outline:4px solid var(--blade);outline-offset:2px}
+.full{width:100%}
+label{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:17px}
+input,select,textarea{font:400 20px/1.3 var(--f-body);min-height:54px;padding:10px 12px;border-radius:10px;border:2px solid var(--line);background:var(--surface);color:var(--fg);box-sizing:border-box;width:100%}
+textarea{min-height:90px}
+form{display:flex;flex-direction:column;gap:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.items{display:flex;flex-direction:column;gap:8px}
+.item{display:grid;grid-template-columns:1fr 92px 96px 46px;gap:6px;align-items:center;background:var(--surface);border:2px solid var(--line);border-radius:10px;padding:8px}
+.item input,.item select{min-height:46px;font-size:17px;padding:6px 8px}
+.item .x{min-height:46px;padding:0;font-size:22px}
+.item .lbl{font-weight:700;font-size:17px;overflow-wrap:anywhere}
+.total{background:var(--fg);color:var(--bg);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;font-variant-numeric:tabular-nums}
+.total .line{display:flex;justify-content:space-between;font-size:17px}
+.total .big{display:flex;justify-content:space-between;align-items:center}
+.total .big b{font:800 44px/1 var(--f-display);color:var(--blade)}
+.hint{color:var(--muted);font-size:16px}
+.empty{border:2px dashed var(--line);border-radius:12px;padding:18px;text-align:center;color:var(--muted)}
+.note{background:var(--surface);border-left:6px solid var(--warn);padding:10px 12px;border-radius:6px;font-size:16px}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.week button{flex-direction:column;gap:2px;min-height:70px;padding:4px 0;font-size:14px;border-width:2px}
+.week button b{font:800 24px/1 var(--f-display)}
+.week button i{font-style:normal;font-size:13px;color:inherit;opacity:.85}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.photos{display:flex;gap:8px;flex-wrap:wrap}
+.photos img{width:88px;height:88px;object-fit:cover;border-radius:8px;border:2px solid var(--line)}
+.chart{overflow-x:auto}
+.chart svg{display:block;width:100%;min-width:320px;height:auto}
+.answer{white-space:pre-wrap;background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:14px;font-size:18px}
+.clover-fab{position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:calc(86px + env(safe-area-inset-bottom,0px));z-index:7;width:76px;height:76px;border-radius:50%;padding:0;border:3px solid var(--blade);background:#0d0d0d;box-shadow:0 8px 20px rgba(0,0,0,.35);overflow:hidden}
+.clover-fab .helper{width:100%;height:100%}
+.cl-head{display:flex;gap:12px;align-items:center}.cl-head>div{flex:1;min-width:0}
+.helper{display:block;border-radius:50%;object-fit:cover;flex:none}
+.helper.mono{display:grid;place-items:center;background:radial-gradient(circle at 35% 30%,#3a0d0d,#0d0d0d 70%);color:var(--blade);font:800 italic 1em var(--f-display);letter-spacing:.02em;box-shadow:inset 0 0 0 3px #b3261e}
+.cl-head .helper{border:3px solid var(--blade)}
+@media (prefers-reduced-motion:no-preference){.helper.live{animation:ready 3.2s ease-in-out infinite}@keyframes ready{0%,100%{box-shadow:0 0 0 0 rgba(252,184,22,0)}50%{box-shadow:0 0 0 6px rgba(252,184,22,.35)}}}
+.cl-log{display:flex;flex-direction:column;gap:10px;max-height:44vh;overflow:auto;margin:14px 0;padding:4px}
+.cl-msg{padding:12px 14px;border-radius:16px;max-width:88%;white-space:pre-wrap;font-size:19px;line-height:1.45}
+.cl-msg.bot{background:var(--surface);border:2px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
+.cl-msg.me{background:var(--turf);color:var(--turf-ink);align-self:flex-end;border-bottom-right-radius:4px}
+#clMic.live{background:#b3261e;border-color:#b3261e;color:#fff}
+.cl-msg.think{color:var(--muted);font-style:italic}
+.cl-sugg{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}.cl-sugg button{white-space:nowrap}
+.cl-form{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.bigacts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.bigacts button{min-height:96px;flex-direction:column;gap:6px;font-size:18px;border-radius:16px}
+.bigacts button span{font-size:30px;line-height:1}
+.bigacts .edit{grid-column:1/-1;min-height:74px;flex-direction:row;font-size:20px;background:var(--navy);color:#fff;border-color:var(--navy)}
+nav{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:2px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav .wrap{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding-block:6px}
+nav button{border:none;flex-direction:column;gap:4px;min-height:64px;font-size:14px;padding:0;background:none;border-radius:10px}
+nav button[aria-current="page"]{background:var(--turf);color:var(--turf-ink)}
+nav svg{width:26px;height:26px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:12px 18px;border-radius:10px;font-weight:700;z-index:30;max-width:calc(100% - 32px)}
+.sheet{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.55);display:flex;align-items:flex-end}
+.sheet .panel{background:var(--bg);width:100%;max-height:94%;overflow:auto;border-radius:16px 16px 0 0;padding-block:8px calc(20px + env(safe-area-inset-bottom,0px))}
+.morebox{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.morebox button{min-height:90px;flex-direction:column;font-size:17px}
+@media (max-width:440px){.grid2{grid-template-columns:1fr}.item{grid-template-columns:1fr 70px 84px 44px}.stat b{font-size:26px}}
+</style>
+
+<header><div class="wrap">
+  <span class="logochip"><img id="brandlogo" src="logo.webp" alt="PowerBlade Lawn Care" onerror="this.parentNode.classList.add('nologo')"><span class="wordmark" aria-hidden="true"><b>POWER</b><i>BLADE</i></span></span>
+  <h1 id="bizname">Owner Panel<small>Making Lawns Loveable</small></h1>
+</div></header>
+
+<main class="wrap" id="view"></main>
+
+<nav><div class="wrap" id="tabs">
+  <button data-tab="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg>Today</button>
+  <button data-tab="schedule"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Schedule</button>
+  <button data-tab="clients"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-6 7-6s7 2 7 6M16 4a4 4 0 0 1 0 8M22 21c0-3-2-5-4-6"/></svg>Clients</button>
+  <button data-tab="money"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Money</button>
+  <button data-tab="more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 6h16M4 12h16M4 18h16"/></svg>More</button>
+</div></nav>
+
+<script>
+/* ===== Service catalog: type area = $/sq ft with minimum, flat = per visit, unit = per qty ===== */
+const DEFAULT_SERVICES = [
+  {k:"mow",label:"Mow",type:"area",rate:.007,min:35,cat:"Lawn"},
+  {k:"edge",label:"Edge",type:"flat",rate:15,cat:"Lawn"},
+  {k:"trim",label:"String trim",type:"flat",rate:15,cat:"Lawn"},
+  {k:"blow",label:"Blow off",type:"flat",rate:10,cat:"Lawn"},
+  {k:"fert",label:"Fertilize",type:"area",rate:.005,min:55,cat:"Treatment"},
+  {k:"weedctl",label:"Weed control spray",type:"area",rate:.004,min:45,cat:"Treatment"},
+  {k:"aerate",label:"Core aeration",type:"area",rate:.006,min:75,cat:"Treatment"},
+  {k:"seed",label:"Overseed",type:"area",rate:.008,min:90,cat:"Treatment"},
+  {k:"leaves",label:"Leaf removal",type:"area",rate:.01,min:60,cat:"Seasonal"},
+  {k:"gutter",label:"Gutter cleaning",type:"flat",rate:95,cat:"Seasonal"},
+  {k:"wash",label:"Pressure washing (per sq ft)",type:"unit",rate:.25,unit:"sq ft",cat:"Seasonal"},
+  {k:"hedges",label:"Hedge trimming",type:"flat",rate:45,cat:"Landscape"},
+  {k:"weeds",label:"Bed weeding",type:"flat",rate:30,cat:"Landscape"},
+  {k:"mulch",label:"Mulch (per yard)",type:"unit",rate:75,unit:"yd",cat:"Landscape"},
+  {k:"sod",label:"Sod install (per sq ft)",type:"unit",rate:1.75,unit:"sq ft",cat:"Landscape"},
+  {k:"plant",label:"Plant install (each)",type:"unit",rate:25,unit:"plant",cat:"Landscape"},
+  {k:"design",label:"Bed design / landscaping",type:"flat",rate:350,cat:"Landscape"},
+  {k:"treetrim",label:"Tree trimming (per tree)",type:"unit",rate:150,unit:"tree",cat:"Trees & hauling"},
+  {k:"brush",label:"Tree & brush removal",type:"flat",rate:250,cat:"Trees & hauling"},
+  {k:"junk",label:"Junk removal (per load)",type:"unit",rate:175,unit:"load",cat:"Trees & hauling"},
+  {k:"hoa",label:"HOA / commercial common area (per visit)",type:"area",rate:.004,min:150,cat:"Commercial"},
+  {k:"custom",label:"Custom item",type:"flat",rate:0,cat:"Other"}
+];
+const EXP_CATS=["Fuel","Equipment","Materials","Repairs","Labor","Insurance","Marketing","Other"];
+const PAY_METHODS=["Cash","Card","Zelle","Cash App","Venmo","Check"];
+
+/* ===== helpers ===== */
+const money=n=>(n<0?"-$":"$")+Math.abs(Math.round((+n||0)*100)/100).toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:2});
+const todayISO=()=>{const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)};
+const addDays=(iso,n)=>{const d=new Date(iso+"T12:00:00");d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)};
+const niceDate=iso=>new Date(iso+"T12:00:00").toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const newId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const mapsLink=a=>"https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(a);
+const routeLink=addrs=>{const d=addrs[addrs.length-1],w=addrs.slice(0,-1);return "https://www.google.com/maps/dir/?api=1&travelmode=driving&destination="+encodeURIComponent(d)+(w.length?"&waypoints="+encodeURIComponent(w.join("|")):"")};
+const svcs=()=>{const o=(state.settings.rates||{});return DEFAULT_SERVICES.map(s=>({...s,...(o[s.k]||{})}))};
+const svc=k=>svcs().find(s=>s.k===k)||{label:k,type:"flat",rate:0};
+function linePrice(it,sqft){const s=svc(it.k);if(it.k==="custom")return +it.price||0;
+  if(s.type==="area")return Math.round(Math.max(s.min||0,(+sqft||0)*s.rate));
+  if(s.type==="unit")return Math.round((+it.qty||0)*s.rate*100)/100;return s.rate}
+function totals(items,disc,taxPct){const sub=items.reduce((t,i)=>t+(+i.price||0),0);const d=+disc||0;const tax=Math.round((sub-d)*(+taxPct||0))/100;return{sub,disc:d,tax,total:Math.max(0,sub-d+tax)}}
+const jobTotal=j=>j.total!=null?+j.total:(+j.price||0);
+const mins=j=>Math.round((j.minutes||0)+(j.startedAt?(Date.now()-j.startedAt)/60000:0));
+
+/* ===== state + storage (cloud db, else this device) ===== */
+const state={clients:[],jobs:[],expenses:[],equipment:[],crew:[],settings:{},tab:"today",loaded:false,cloud:false,offline:false,day:todayISO(),cfilter:"active"};
+const COLS=["clients","jobs","expenses","equipment","crew"];
+let db=null,assets=null,sampleFn=null,downloads=null;
+const local={read(k,d){try{return JSON.parse(localStorage.getItem("pblc_"+k))??d}catch(e){return d}},write(k,v){try{localStorage.setItem("pblc_"+k,JSON.stringify(v))}catch(e){}}};
+async function save(col,id,data){
+  if(db){await db.collection(col).doc(id).set(data);return}
+  const a=local.read(col,[]).filter(x=>x.id!==id);a.push({...data,id});local.write(col,a);state[col]=a;render()}
+async function remove(col,id){
+  if(db){await db.collection(col).doc(id).delete();return}
+  const a=local.read(col,[]).filter(x=>x.id!==id);local.write(col,a);state[col]=a;render()}
+async function saveSettings(s){
+  if(db){await db.doc("settings/main").set(s);return}
+  local.write("settings",s);state.settings=s;render()}
+const clean=o=>{const c={...o};delete c.id;delete c.example;return c};
+async function guard(p,ok){try{await p;ok&&toast(ok)}catch(e){toast(e&&e.code==="quota_exceeded"?"Storage is full. Delete old records to add more.":"Couldn't save. Check your connection and try again.")}}
+
+async function boot(){
+  render();
+  const timer=setTimeout(()=>{if(!state.confirmed){state.offline=true;state.loaded=true;render()}},10000);
+  const fallback=()=>{clearTimeout(timer);if(!local.read("seeded",false)){seedDemo();local.write("seeded",true)}COLS.forEach(c=>state[c]=local.read(c,[]));state.demo=state.clients.some(c=>c.example);state.settings=local.read("settings",{});state.loaded=true;render()};
+  if(!window.claude){fallback();return}
+  db=await window.claude.use("db");
+  if(!db){fallback();return}
+  state.cloud=true;let fresh=0;
+  const done=()=>{if(++fresh>=COLS.length+1){clearTimeout(timer);state.confirmed=true;state.offline=false}};
+  COLS.forEach(col=>{let f=false;db.collection(col).onSnapshot(s=>{state[col]=s.docs.map(d=>({...d.data(),id:d.id}));if(!s.metadata.fromCache&&!f){f=true;done()}state.loaded=true;render()},()=>{clearTimeout(timer);state.loaded=true;state.offline=true;render()})});
+  let fs=false;db.doc("settings/main").onSnapshot(s=>{state.settings=s.exists?s.data():{};if(!s.metadata.fromCache&&!fs){fs=true;done()}render()},()=>{});
+  window.claude.use("assets").then(a=>{assets=a});
+  window.claude.use("sample").then(s=>{sampleFn=s;if(state.tab==="more")render()});
+  window.claude.use("downloads").then(d=>{downloads=d});
+}
+
+/* ===== ui plumbing ===== */
+function toast(m){const t=document.createElement("div");t.className="toast";t.setAttribute("role","status");t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2400)}
+function sheet(html,mount){const s=document.createElement("div");s.className="sheet";s.innerHTML=`<div class="panel"><div class="wrap">${html}</div></div>`;
+  s.addEventListener("click",e=>{if(e.target===s||e.target.closest("[data-close]"))s.remove()});document.body.appendChild(s);mount&&mount(s);return s}
+async function copy(text){try{await navigator.clipboard.writeText(text);toast("Copied. Paste it into a text or email.")}
+  catch(e){sheet(`<h2>Copy this</h2><textarea id="cp" readonly style="min-height:220px">${esc(text)}</textarea><button class="full" data-close>Close</button>`,s=>{const t=s.querySelector("#cp");t.focus();t.select()})}}
+function armed(btn,label,fn){let a=false;btn.onclick=()=>{if(!a){a=true;btn.textContent=label;setTimeout(()=>{a=false},4000);return}fn()}}
+const biz=()=>state.settings.name||"PowerBlade Lawn Care";
+const DEF={phone:"(615) 587-2226",email:"PowerBladeLawncare@gmail.com",area:"Gallatin · Hendersonville · Nashville, TN"};
+function statusNote(){
+  if(!state.loaded)return `<div class="empty">Loading your business…</div>`;
+  if(state.offline)return `<p class="note">Can't reach your saved data right now. What you see may be out of date.</p>`;
+  if(!state.cloud)return state.demo?`<p class="note">Demo mode: sample customers shown with dashed borders. Clear them in More → Business &amp; rates.</p>`:"";return ""}
+
+/* ===== job card ===== */
+function jobCard(j,opts={}){
+  const items=(j.items||[]).map(i=>`<span class="tag">${esc(i.k==="custom"?(i.label||"Custom"):svc(i.k).label)}${i.qty&&svc(i.k).type==="unit"?" ×"+i.qty:""}</span>`).join(" ");
+  const run=!!j.startedAt,m=mins(j);
+  const next=j.status==="scheduled"?`<button class="go small" data-act="done" data-id="${j.id}">Mark done</button>`:j.status==="done"?`<button class="primary small" data-act="pay" data-id="${j.id}">Record payment</button>`:"";
+  const timer=j.status==="scheduled"?`<button class="small" data-act="timer" data-id="${j.id}" aria-pressed="${run}">${run?"Stop timer":"Start timer"}</button>`:"";
+  return `<div class="card${j.example?" example":""}${run?" running":""}">
+    <div class="row"><div class="grow"><div class="name">${esc(j.clientName||"Walk-up job")}</div>
+      <div class="sub">${niceDate(j.date)}${j.repeat&&j.repeat!=="none"?" · "+j.repeat:""}${j.crew?" · "+esc(j.crew):""}${j.example?" · example":""}</div></div>
+      <div class="price">${money(jobTotal(j))}</div></div>
+    ${j.address?`<div class="sub">${esc(j.address)}</div>`:""}
+    ${items?`<div class="row">${items}</div>`:""}
+    ${j.notes?`<div class="sub">📝 ${esc(j.notes)}</div>`:""}
+    ${(j.photos||[]).length?`<div class="photos">${j.photos.map(p=>`<img src="/_blob/${esc(p)}" alt="Job photo">`).join("")}</div>`:""}
+    <div class="row"><span class="pill ${j.status}">${j.status==="done"?"Owed":j.status==="paid"?"Paid"+(j.paidMethod?" · "+esc(j.paidMethod):""):"Scheduled"}</span>
+      ${m?`<span class="tag">⏱ ${Math.floor(m/60)}h ${m%60}m</span>`:""}<span class="grow"></span>
+      ${opts.order?`<button class="small" data-act="up" data-id="${j.id}" aria-label="Move up">▲</button><button class="small" data-act="down" data-id="${j.id}" aria-label="Move down">▼</button>`:""}</div>
+    <div class="row">${j.address?`<a class="btn small" href="${mapsLink(j.address)}" target="_blank" rel="noopener">Directions</a>`:""}
+      ${timer}<button class="small" data-act="textjob" data-id="${j.id}">Text</button><button class="small" data-act="invoice" data-id="${j.id}">Invoice</button><button class="small" data-act="edit" data-id="${j.id}">Edit</button>${next}</div>
+  </div>`}
+
+/* ===== views ===== */
+function vToday(){
+  const t=todayISO(),wk=addDays(t,-6);
+  const todays=state.jobs.filter(j=>j.date===t&&j.status==="scheduled").sort((a,b)=>(a.order??a.created??0)-(b.order??b.created??0));
+  const owed=state.jobs.filter(j=>j.status==="done");
+  const late=state.jobs.filter(j=>j.status==="scheduled"&&j.date<t);
+  const weekPaid=state.jobs.filter(j=>j.status==="paid"&&(j.paidOn||j.date)>=wk).reduce((s,j)=>s+jobTotal(j),0);
+  const dueEq=state.equipment.filter(e=>(+e.hours||0)-(+e.lastService||0)>=(+e.interval||50));
+  const addrs=todays.map(j=>j.address).filter(Boolean);
+  const dayValue=todays.reduce((s,j)=>s+jobTotal(j),0);
+  return `${statusNote()}
+  <div class="stats">
+    <div class="stat"><b>${todays.length}</b><span>Stops · ${money(dayValue)}</span></div>
+    <div class="stat${owed.length?" alert":""}"><b>${money(owed.reduce((s,j)=>s+jobTotal(j),0))}</b><span>Owed to you</span></div>
+    <div class="stat"><b>${money(weekPaid)}</b><span>Paid 7 days</span></div>
+  </div>
+  <div class="bigacts">
+    <button class="edit" data-act="go-site"><span>✏️</span> Edit my website</button>
+    <button class="primary" data-act="new"><span>➕</span>New job</button>
+    <button class="go" data-act="quote"><span>🧾</span>Estimate</button>
+    <button data-act="clover"><span>🥷🏾</span>Ask ${esc(BOT_NAME())}</button>
+    <button data-act="go-crew"><span>👷🏾</span>My crew</button>
+  </div>
+  ${dueEq.length?`<p class="note">Maintenance due: ${dueEq.map(e=>esc(e.name)).join(", ")}. Open More → Equipment.</p>`:""}
+  <h2>Today's route · ${niceDate(t)}</h2>
+  ${todays.length?`<div class="grid2" style="margin-bottom:12px">${addrs.length?`<a class="btn go" href="${routeLink(addrs)}" target="_blank" rel="noopener">Start route (${addrs.length} stops)</a>`:"<span></span>"}<button id="rain">Rain delay → tomorrow</button></div><div class="grid2" style="margin-bottom:12px"><button data-act="go-crew">Text crew their routes</button><button data-act="textall" data-k="rain">Text today's clients</button></div>`:""}
+  <div class="list">${todays.length?todays.map(j=>jobCard(j,{order:true})).join(""):`<div class="empty">No stops today. Add a job or send an estimate.</div>`}</div>
+  ${late.length?`<h2>Running late</h2><div class="list">${late.map(j=>jobCard(j)).join("")}</div>`:""}
+  ${owed.length?`<h2>Collect payment</h2><div class="list">${owed.map(j=>jobCard(j)).join("")}</div>`:""}
+  <p class="hint" style="margin-top:18px">Check the sky first: <a href="https://forecast.weather.gov/MapClick.php?CityName=Gallatin&state=TN" target="_blank" rel="noopener">Gallatin, TN forecast</a>. Tap the mic on your keyboard to talk instead of type.</p>`}
+
+function vSchedule(){
+  const d=state.day,start=addDays(d,-((new Date(d+"T12:00:00").getDay()+6)%7));
+  const days=[...Array(7)].map((_,i)=>addDays(start,i));
+  const count=x=>state.jobs.filter(j=>j.date===x&&j.status==="scheduled").length;
+  const list=state.jobs.filter(j=>j.date===d).sort((a,b)=>(a.order??a.created??0)-(b.order??b.created??0));
+  const val=list.reduce((s,j)=>s+jobTotal(j),0);
+  return `${statusNote()}
+  <div class="row" style="margin-bottom:8px"><button class="small" data-act="wk" data-n="-7" aria-label="Previous week">◀ Week</button><span class="grow" style="text-align:center;font-weight:700">${niceDate(start)} – ${niceDate(days[6])}</span><button class="small" data-act="wk" data-n="7" aria-label="Next week">Week ▶</button></div>
+  <div class="week">${days.map(x=>`<button data-act="day" data-d="${x}" aria-pressed="${x===d}"><i>${new Date(x+"T12:00:00").toLocaleDateString(undefined,{weekday:"short"})}</i><b>${+x.slice(8)}</b><i>${count(x)||"–"} job${count(x)===1?"":"s"}</i></button>`).join("")}</div>
+  <h2>${niceDate(d)} · ${money(val)}</h2>
+  <button class="primary full" data-act="new" style="margin-bottom:12px">+ Job on this day</button>
+  <div class="list">${list.length?list.map(j=>jobCard(j)).join(""):`<div class="empty">Open day. Good time for a cleanup or install.</div>`}</div>`}
+
+function clientStats(c){const js=state.jobs.filter(j=>j.clientId===c.id);return{visits:js.filter(j=>j.status!=="scheduled").length,paid:js.filter(j=>j.status==="paid").reduce((s,j)=>s+jobTotal(j),0),next:js.filter(j=>j.status==="scheduled").map(j=>j.date).sort()[0]}}
+function vClients(){
+  const f=state.cfilter,q=(state.cq||"").toLowerCase();
+  const cs=state.clients.filter(c=>(f==="leads"?c.stage==="lead":c.stage!=="lead")&&(!q||(c.name+" "+c.address+" "+c.phone).toLowerCase().includes(q))).sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+  const nLead=state.clients.filter(c=>c.stage==="lead").length;
+  return `${statusNote()}
+  <div class="grid2"><button class="primary" data-act="newclient">+ Client</button><button data-act="newlead">+ Lead</button></div>
+  <div class="chips" style="margin-top:12px"><button class="small" data-act="cf" data-f="active" aria-pressed="${f==="active"}">Clients</button><button class="small" data-act="cf" data-f="leads" aria-pressed="${f==="leads"}">Leads (${nLead})</button></div>
+  <label for="cq" style="margin-top:12px">Search<input id="cq" type="search" value="${esc(state.cq||"")}" placeholder="Name, street, phone"></label>
+  <h2>${f==="leads"?"Leads":"Clients"} · ${cs.length}</h2>
+  <div class="list">${cs.length?cs.map(c=>{const st=clientStats(c);return `<div class="card${c.example?" example":""}">
+    <div class="row"><div class="name grow">${esc(c.name)}</div>${c.stage==="lead"?`<span class="pill lead">${esc(c.leadStatus||"New lead")}</span>`:""}${c.example?'<span class="tag">example</span>':""}</div>
+    <div class="sub">${esc(c.address||"No address yet")}${c.lot?` · ${(+c.lot).toLocaleString()} sq ft`:""}</div>
+    ${c.phone?`<div class="sub" style="user-select:all">📞 ${esc(c.phone)}</div>`:""}
+    ${c.stage!=="lead"?`<div class="sub">${st.visits} visits · ${money(st.paid)} lifetime${st.next?" · next "+niceDate(st.next):""}</div>`:c.source?`<div class="sub">Source: ${esc(c.source)}</div>`:""}
+    ${c.notes?`<div class="sub">📝 ${esc(c.notes)}</div>`:""}
+    <div class="row">${c.address?`<a class="btn small" href="${mapsLink(c.address)}" target="_blank" rel="noopener">Directions</a>`:""}
+      ${c.phone?`<button class="small" data-act="textclient" data-id="${c.id}">Text</button>`:""}<button class="small" data-act="history" data-id="${c.id}">History</button>
+      <button class="small go" data-act="quoteclient" data-id="${c.id}">Estimate</button>
+      ${c.stage==="lead"?`<button class="small primary" data-act="convert" data-id="${c.id}">Won → client</button>`:""}
+      <button class="small" data-act="editclient" data-id="${c.id}">Edit</button></div></div>`}).join(""):`<div class="empty">${f==="leads"?"Log calls and door-knocks here so no lead slips away.":"Add your first client to start scheduling."}</div>`}</div>`}
+
+function monthKey(iso){return iso.slice(0,7)}
+function vMoney(){
+  const now=todayISO(),mk=monthKey(now);
+  const paid=state.jobs.filter(j=>j.status==="paid");
+  const rev=m=>paid.filter(j=>monthKey(j.paidOn||j.date)===m).reduce((s,j)=>s+jobTotal(j),0);
+  const exp=m=>state.expenses.filter(e=>monthKey(e.date)===m).reduce((s,e)=>s+(+e.amount||0),0);
+  const owed=state.jobs.filter(j=>j.status==="done").reduce((s,j)=>s+jobTotal(j),0);
+  const months=[...Array(6)].map((_,i)=>{const d=new Date(now+"T12:00:00");d.setDate(1);d.setMonth(d.getMonth()-5+i);return d.toISOString().slice(0,7)});
+  const data=months.map(m=>({m,r:rev(m),e:exp(m)}));
+  const max=Math.max(100,...data.map(x=>Math.max(x.r,x.e)));
+  const W=600,H=230,pl=56,pb=34,pt=14,bw=(W-pl-10)/6;
+  const y=v=>H-pb-(v/max)*(H-pb-pt);
+  const ticks=[0,max/2,max];
+  const chart=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Revenue and expenses, last six months">
+    ${ticks.map(t=>`<line x1="${pl}" x2="${W-6}" y1="${y(t)}" y2="${y(t)}" stroke="var(--line)" stroke-width="1"/><text x="${pl-6}" y="${y(t)+5}" text-anchor="end" font-size="14" fill="var(--muted)">${money(Math.round(t))}</text>`).join("")}
+    ${data.map((d,i)=>{const x=pl+i*bw+bw*.14,w=bw*.34;return `<rect x="${x}" y="${y(d.r)}" width="${w}" height="${H-pb-y(d.r)}" fill="var(--turf)" rx="3"/><rect x="${x+w+4}" y="${y(d.e)}" width="${w}" height="${H-pb-y(d.e)}" fill="var(--exp)" rx="3"/><text x="${pl+i*bw+bw/2}" y="${H-10}" text-anchor="middle" font-size="15" fill="var(--fg)" font-weight="700">${new Date(d.m+"-15T12:00:00").toLocaleDateString(undefined,{month:"short"})}</text>`}).join("")}
+  </svg>`;
+  const ytd=paid.filter(j=>(j.paidOn||j.date).slice(0,4)===now.slice(0,4)).reduce((s,j)=>s+jobTotal(j),0);
+  const ytdExp=state.expenses.filter(e=>e.date.slice(0,4)===now.slice(0,4)).reduce((s,e)=>s+(+e.amount||0),0);
+  const exps=[...state.expenses].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,25);
+  const byMethod=PAY_METHODS.map(p=>[p,paid.filter(j=>monthKey(j.paidOn||j.date)===mk&&j.paidMethod===p).reduce((s,j)=>s+jobTotal(j),0)]).filter(x=>x[1]);
+  return `${statusNote()}
+  <div class="stats">
+    <div class="stat"><b>${money(rev(mk))}</b><span>Revenue this month</span></div>
+    <div class="stat"><b>${money(exp(mk))}</b><span>Expenses</span></div>
+    <div class="stat"><b style="color:${rev(mk)-exp(mk)>=0?"var(--ok)":"var(--due)"}">${money(rev(mk)-exp(mk))}</b><span>Profit</span></div>
+    <div class="stat${owed?" alert":""}"><b>${money(owed)}</b><span>Unpaid invoices</span></div>
+  </div>
+  <h2>Last 6 months</h2>
+  <div class="row hint"><span class="tag" style="background:var(--turf);color:var(--turf-ink)">Revenue</span><span class="tag" style="background:var(--exp);color:var(--bg)">Expenses</span></div>
+  <div class="chart">${chart}</div>
+  <p class="sub">Year to date: ${money(ytd)} in, ${money(ytdExp)} out, ${money(ytd-ytdExp)} profit. Set aside about 25–30% of profit for taxes.</p>
+  ${byMethod.length?`<p class="sub">This month by method: ${byMethod.map(([p,v])=>`${p} ${money(v)}`).join(" · ")}</p>`:""}
+  <div class="grid2" style="margin-top:12px"><button class="primary" data-act="newexp">+ Expense</button><button data-act="csv">Export CSV</button></div>
+  <h2>Expenses</h2>
+  <div class="list">${exps.length?exps.map(e=>`<div class="card"><div class="row"><div class="grow"><div class="name">${esc(e.cat)}</div><div class="sub">${niceDate(e.date)}${e.note?" · "+esc(e.note):""}</div></div><div class="price" style="color:var(--exp)">${money(e.amount)}</div><button class="small" data-act="editexp" data-id="${e.id}">Edit</button></div></div>`).join(""):`<div class="empty">Log fuel, blades, mulch and repairs to see real profit.</div>`}</div>`}
+
+function vMore(){
+  const sub=state.more||"menu";
+  if(sub==="quote")return vQuote();
+  if(sub==="equip")return vEquip();
+  if(sub==="crew")return vCrew();
+  if(sub==="site")return vSite();
+  if(sub==="texts")return vTexts();
+  if(sub==="settings")return vSettings();
+  if(sub==="ai")return vAI();
+  return `<h2>Tools</h2><div class="morebox">
+    <button data-act="go" data-v="quote"><span style="font-size:30px">🧾</span>Estimate builder</button>
+    <button data-act="go" data-v="site"><span style="font-size:30px">🖼️</span>Website editor</button>
+    <button data-act="go" data-v="crew"><span style="font-size:30px">👷🏾</span>Crew</button>
+    <button data-act="go" data-v="texts"><span style="font-size:30px">💬</span>Text templates</button>
+    <button data-act="go" data-v="equip"><span style="font-size:30px">🔧</span>Equipment</button>
+    ${sampleFn?`<button data-act="go" data-v="ai"><span style="font-size:30px">✨</span>AI helper</button>`:""}
+    <button data-act="go" data-v="settings"><span style="font-size:30px">⚙️</span>Business &amp; rates</button>
+  </div>`}
+const back=`<button class="small" data-act="go" data-v="menu">◀ Tools</button>`;
+
+/* ----- estimate builder ----- */
+let Q={clientId:"",sqft:7000,items:[],disc:0};
+function seedQ(){if(!Q.items.length)Q.items=["mow","edge","trim","blow"].map(k=>({k,qty:1}));Q.items.forEach(i=>i.price=linePrice(i,Q.sqft))}
+function itemsEditor(items,prefix){
+  return `<div class="items" id="${prefix}items">${items.map((it,n)=>{const s=svc(it.k);return `<div class="item" data-n="${n}">
+    ${it.k==="custom"?`<input class="${prefix}lbl" value="${esc(it.label||"")}" placeholder="Describe item" aria-label="Item description">`:`<span class="lbl">${esc(s.label)}</span>`}
+    ${s.type==="unit"?`<input class="${prefix}qty" type="number" inputmode="decimal" value="${it.qty??1}" aria-label="Quantity">`:`<span class="sub">${s.type==="area"?"by size":"flat"}</span>`}
+    <input class="${prefix}price" type="number" inputmode="decimal" step="0.01" value="${it.price??0}" aria-label="Price">
+    <button type="button" class="x" data-rm="${n}" aria-label="Remove ${esc(s.label)}">×</button></div>`}).join("")}</div>
+  <label for="${prefix}add">Add a service<select id="${prefix}add"><option value="">Choose…</option>${[...new Set(svcs().map(s=>s.cat))].map(c=>`<optgroup label="${c}">${svcs().filter(s=>s.cat===c).map(s=>`<option value="${s.k}">${esc(s.label)}</option>`).join("")}</optgroup>`).join("")}</select></label>`}
+function totalsBox(t,id){return `<div class="total" id="${id}"><div class="line"><span>Subtotal</span><span>${money(t.sub)}</span></div>${t.disc?`<div class="line"><span>Discount</span><span>-${money(t.disc)}</span></div>`:""}${t.tax?`<div class="line"><span>Tax</span><span>${money(t.tax)}</span></div>`:""}<div class="big"><span>Total</span><b>${money(t.total)}</b></div></div>`}
+function vQuote(){
+  seedQ();const opts=state.clients.map(c=>`<option value="${c.id}"${c.id===Q.clientId?" selected":""}>${esc(c.name)}${c.stage==="lead"?" (lead)":""}</option>`).join("");
+  return `${back}<h2>Estimate builder</h2><form id="qform">
+    <label for="qclient">Client or lead<select id="qclient"><option value="">New / walk-up</option>${opts}</select></label>
+    <label for="qsqft">Lawn size (sq ft)<input id="qsqft" type="number" inputmode="numeric" value="${Q.sqft}"></label>
+    <div class="row"><button type="button" class="small" data-lot="3000">Small 3k</button><button type="button" class="small" data-lot="7000">Avg 7k</button><button type="button" class="small" data-lot="15000">Big 15k</button><button type="button" class="small" data-lot="21780">½ acre</button><button type="button" class="small" data-lot="43560">1 acre</button></div>
+    ${itemsEditor(Q.items,"q")}
+    <label for="qdisc">Discount ($)<input id="qdisc" type="number" inputmode="decimal" value="${Q.disc||""}" placeholder="0"></label>
+    ${totalsBox(totals(Q.items,Q.disc,state.settings.tax),"qtotal")}
+    <div class="grid2"><button type="button" data-act="copyquote">Copy estimate</button><button type="button" class="primary" data-act="quotejob">Book as job</button></div>
+    <p class="hint">Size-based prices update when lawn size changes. Any price can be typed over.</p></form>`}
+
+/* ===== Mr. Ed — owner assistant ===== */
+const HELPER_IMG=()=>{try{return localStorage.getItem("pb_helperImg")||""}catch(e){return ""}};
+const CLOVER_SVG=(size,cls="")=>HELPER_IMG()?`<img class="helper ${cls}" src="${HELPER_IMG()}" alt="" width="${size}" height="${size}">`:`<span class="helper mono ${cls}" style="width:${size}px;height:${size}px;font-size:${Math.round(size*.34)}px" aria-hidden="true">Ed</span>`;
+const BOT_NAME=()=>state.settings.botName||"Mr. Ed";
+
+/* answers it can give from the owner's own records, exactly */
+function cloverData(q){const t=todayISO(),wk=addDays(t,-6),mk=t.slice(0,7);
+  const owed=state.jobs.filter(j=>j.status==="done"),today=state.jobs.filter(j=>j.date===t&&j.status==="scheduled");
+  const paidM=state.jobs.filter(j=>j.status==="paid"&&(j.paidOn||j.date).slice(0,7)===mk).reduce((s,j)=>s+jobTotal(j),0);
+  const expM=state.expenses.filter(e=>e.date.slice(0,7)===mk).reduce((s,e)=>s+(+e.amount||0),0);
+  if(/owe|unpaid|collect|outstanding/.test(q))return owed.length?`${owed.length} customer${owed.length>1?"s owe":" owes"} you ${money(owed.reduce((s,j)=>s+jobTotal(j),0))}:\n${owed.map(j=>`• ${j.clientName||"Walk-up"}: ${money(jobTotal(j))} (${niceDate(j.date)})`).join("\n")}\n\nTap Today, then "Record payment" on each one when they pay.`:"Nobody owes you right now. Every finished job is paid.";
+  if(/today|schedule|route|stops/.test(q)&&!/how/.test(q))return today.length?`You have ${today.length} stop${today.length>1?"s":""} today worth ${money(today.reduce((s,j)=>s+jobTotal(j),0))}:\n${today.map((j,i)=>`${i+1}. ${j.clientName||"Walk-up"}${j.crew?" ("+j.crew+")":""}`).join("\n")}`:"Nothing is scheduled today.";
+  if(/tomorrow/.test(q)){const tm=state.jobs.filter(j=>j.date===addDays(t,1)&&j.status==="scheduled");return tm.length?`Tomorrow: ${tm.map(j=>j.clientName||"Walk-up").join(", ")}.`:"Nothing is scheduled tomorrow yet."}
+  if(/(made|earn|revenue|income|profit|this month)/.test(q))return `This month so far: ${money(paidM)} paid in, ${money(expM)} in expenses, so ${money(paidM-expM)} profit. Open the Money tab for the chart.`;
+  if(/lead/.test(q)&&/(how many|list|who|new)/.test(q)){const L=state.clients.filter(c=>c.stage==="lead");return L.length?`${L.length} open lead${L.length>1?"s":""}: ${L.map(c=>`${c.name} (${c.leadStatus||"new"})`).join(", ")}. Tap Clients, then Leads.`:"No open leads right now."}
+  if(/(how many|number of) (clients|customers)/.test(q))return `You have ${state.clients.filter(c=>c.stage!=="lead").length} clients and ${state.clients.filter(c=>c.stage==="lead").length} leads.`;
+  if(/(mower|equipment|service due|oil)/.test(q)&&!/how/.test(q)){const due=state.equipment.filter(e=>(+e.hours||0)-(+e.lastService||0)>=(+e.interval||50));return due.length?`Service is due on: ${due.map(e=>e.name).join(", ")}.`:"All equipment is up to date on service."}
+  return null}
+
+/* how to use the app — step by step, plain words */
+const CLOVER_HELP=[
+ [/(edit|change|update).*(website|site|photo|picture|wording|headline)|website editor/,"To change your website:\n1. Tap the big \"Edit my website\" button on Today.\n2. Tap \"Change photo\" on any picture, or type new words in any box.\n3. Changes save by themselves. Tap \"See it on the site\" to look.\nTap \"Original\" on a photo to put your old one back."],
+ [/(add|new).*(service)/,"To add a service to your website: tap \"Edit my website\", scroll to Services, tap \"+ Add a service\", then type its name and description and add a photo."],
+ [/(add|new|book|schedule).*(job|visit|appointment)/,"To book a job: tap Today, then the yellow \"+ New job\" button. Pick the customer, the date, how often, and the services. The price fills in by itself. Tap \"Save job\"."],
+ [/(add|new).*(client|customer)/,"To add a customer: tap Clients at the bottom, then \"+ Client\". Type their name, address and phone, then tap Save."],
+ [/(text|message).*(customer|client|crew)|send a text/,"To text a customer: tap \"Text\" on their job or their name. Pick a message like \"On my way\" or \"Payment reminder\", then tap \"Open in Messages\" and hit send."],
+ [/(record|mark|got).*(paid|payment)|how.*paid/,"When a customer pays: tap Today, find them under \"Collect payment\", tap \"Record payment\", pick how they paid (cash, Zelle, card…), then \"Mark paid\"."],
+ [/(estimate|quote).*(make|send|write|build)|how.*(estimate|quote)/,"To make an estimate: tap More, then \"Estimate builder\". Pick the customer, set the lawn size, add services, then \"Copy estimate\" to text it or \"Book as job\"."],
+ [/\b(crew|workers?|employees?)\b/,"To manage your crew: tap More, then Crew. Add each worker with their phone. When you make a job, pick who does it. Then tap \"Text today's route\" to send them their stops."],
+ [/\brain\b/,"Rain day: on Today, tap \"Rain delay → tomorrow\" twice to move today's jobs, then \"Text today's clients\" to let everyone know."],
+ [/expense|gas|fuel|receipt/,"To log an expense: tap Money, then \"+ Expense\". Pick the type (fuel, equipment…), type the amount, and Save."],
+ [/\b(pin|lock|password)\b/,"To lock the Owner Panel: tap More, then \"Business & rates\", type a PIN in \"Owner PIN\", and Save. You'll enter it each time you open the panel."],
+ [/\b(prices?|rates?|charges?)\b/,"Your service prices live in More → \"Business & rates\". Change a rate there and every new estimate uses it."],
+];
+/* Middle Tennessee lawn & landscape basics (UT Extension-style guidance) */
+const CLOVER_LAWN=[
+ [/aerat|overseed|seed/,"In Middle Tennessee most lawns are tall fescue. Core aerate and overseed in early fall, about early September to mid October, when nights cool down. Bermuda and zoysia lawns are aerated in early summer (June–July) while they're actively growing, and aren't overseeded with fescue."],
+ [/(how (high|tall|short)|mow(ing)? height|cut height)/,"Tall fescue: mow at 3½–4 inches. Bermuda: 1–2 inches. Zoysia: 1½–2½ inches. Never cut off more than one-third of the grass blade at one time, and keep blades sharp."],
+ [/fertiliz|feed/,"Tall fescue is fed mainly in the fall (September and November are the key months), with little or none in summer. Bermuda and zoysia are fed in late spring through summer, about May to August. A soil test through UT Extension tells you exactly what's needed."],
+ [/crabgrass|pre.?emergent/,"Put down crabgrass pre-emergent in late winter to early spring, before soil reaches about 55°F (around when forsythia blooms, typically early-to-mid March in Middle Tennessee). Don't use it on areas you plan to seed."],
+ [/water/,"Lawns need about 1 inch of water a week, counting rain. Water early in the morning, deeply and less often, so roots grow deep and disease stays down."],
+ [/mulch/,"Spread mulch 2–3 inches deep and keep it a few inches away from tree trunks and plant stems. Avoid \"mulch volcanoes\" piled against trunks; they invite rot and pests."],
+ [/hedge|shrub|prun/,"Spring-flowering shrubs (like azaleas and forsythia) are pruned right after they bloom. Most hedges are trimmed in late spring and early summer. Avoid heavy pruning from late August on, so new growth can harden before frost."],
+ [/leaf|leaves/,"Light leaf cover can be mulch-mowed back into the lawn. Heavy cover should be removed so it doesn't smother the grass, especially on newly seeded fescue."],
+ [/sod/,"Sod is best laid when the grass type is actively growing: fescue in fall or spring, bermuda and zoysia in late spring to summer. Water daily for the first two weeks, then taper off as it roots."],
+ [/grub|brown patch|disease|fungus/,"Brown patch is common on tall fescue in hot, humid summers; avoid summer fertilizing and evening watering. Grub damage shows as turf that peels up like carpet; treatment timing matters, so check UT Extension guidance or a local turf professional before applying products."],
+];
+function cloverLocal(q){q=q.toLowerCase();const lawn=(CLOVER_LAWN.find(([r])=>r.test(q))||[])[1],help=(CLOVER_HELP.find(([r])=>r.test(q))||[])[1];
+  return cloverData(q)||(/\b(how do i|how to|where|tap|app|button|website)\b/.test(q)?help||lawn:lawn||help)||null}
+/* ---- voice: add clients and leads by speaking ---- */
+const NUMW={zero:0,oh:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9};
+function voiceAdd(text){const t=text.trim().replace(/[.!?]$/,"");const m=t.match(/^(?:please\s+)?(?:add|new|create|save)\s+(?:a\s+|an\s+)?(?:new\s+)?(client|customer|lead)\s+(?:named\s+|called\s+)?(.+)$/i);if(!m)return null;
+  let rest=m[2];const wordsToDigits=x=>x.replace(/\b(zero|oh|one|two|three|four|five|six|seven|eight|nine)\b/gi,w=>NUMW[w.toLowerCase()]);
+  let phone="";const pm=wordsToDigits(rest).match(/(?:phone(?: number)?|number|cell)\s*(?:is\s*)?([\d\s().-]{10,})/i)||wordsToDigits(rest).match(/(\d[\d\s().-]{9,}\d)\s*$/);
+  if(pm){const d=pm[1].replace(/\D/g,"").slice(-10);if(d.length===10)phone=`(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;rest=wordsToDigits(rest).replace(pm[0],"")}
+  let address="";const am=rest.match(/\s(?:at|address(?: is)?|lives at|on)\s+(.+?)(?:,?\s+(?:phone|number|cell)\b.*)?$/i);if(am){address=am[1].trim().replace(/[, ]+$/,"").replace(/\b[a-z]/g,c=>c.toUpperCase());rest=rest.slice(0,am.index)}
+  const name=rest.replace(/[, ]+$/,"").replace(/\b\w/g,c=>c.toUpperCase()).trim();if(!name)return null;
+  return {name,address,phone,stage:/lead/i.test(m[1])?"lead":"active"}}
+async function voiceSave(c){const id=newId();await save("clients",id,{...c,source:c.stage==="lead"?"Voice note":"",leadStatus:c.stage==="lead"?"New lead":undefined,created:Date.now()});go();return `Saved ${c.stage==="lead"?"lead":"client"} ${c.name}${c.address?" at "+c.address:""}${c.phone?", phone "+c.phone:""}. You can add more details later in Clients.`}
+const Rec=window.SpeechRecognition||window.webkitSpeechRecognition;
+function speak(t){try{if(!local.read("speak",true)||!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t.replace(/[•*]/g,"").replace(/\n+/g,". "));u.rate=1;speechSynthesis.speak(u)}catch(e){}}
+
+/* full AI answers through PowerBlade's private connection (Cloudflare function), if set up */
+function cloverContext(){const t=todayISO();const owed=state.jobs.filter(j=>j.status==="done");
+  return `Business: ${biz()}, Gallatin TN. Today ${t}. Services and rates: ${svcs().filter(s=>s.k!=="custom").map(s=>s.label).join(", ")}. Clients ${state.clients.filter(c=>c.stage!=="lead").length}, leads ${state.clients.filter(c=>c.stage==="lead").length}. Today's jobs: ${state.jobs.filter(j=>j.date===t&&j.status==="scheduled").map(j=>(j.clientName||"Walk-up")+" "+money(jobTotal(j))).join("; ")||"none"}. Owed: ${owed.map(j=>(j.clientName||"Walk-up")+" "+money(jobTotal(j))).join("; ")||"none"}. Crew: ${state.crew.map(c=>c.name).join(", ")||"none"}.`}
+let cloverHist=[];
+async function cloverAsk(q){const code=local.read("aiCode","");
+  try{const r=await fetch("api/ask",{method:"POST",headers:{"content-type":"application/json","x-owner-code":code},body:JSON.stringify({question:q,context:cloverContext(),history:cloverHist.slice(-6),name:BOT_NAME()})});
+    if(r.ok){const j=await r.json();if(j.answer){cloverHist.push({role:"user",content:q},{role:"assistant",content:j.answer});return j.answer}}}catch(e){}
+  return cloverLocal(q)||`I'm not sure about that one yet. Right now I can answer questions about your jobs, payments, crew and how to use this app, plus Middle Tennessee lawn basics. Once your private AI connection is turned on, I can answer anything about lawn care and landscaping.`}
+
+function cloverOpen(){const s=sheet(`<div class="cl-head">${CLOVER_SVG(110,"live")}<div><h2 style="margin:0">${esc(BOT_NAME())}</h2><p class="hint">Your PowerBlade helper. Ask me anything about your business, this app, or lawn care.</p></div><button class="small" data-close>Close</button></div>
+  <div class="cl-log" id="clLog"><div class="cl-msg bot">Hi! I'm ${esc(BOT_NAME())}. Blade is sharp and ready. What can I help you with?</div></div>
+  <div class="cl-sugg">${["Who owes me money?","What's on today?","How do I edit my website?","How do I text a customer?","When should I aerate?","How much did I make this month?"].map(x=>`<button class="small" data-q="${esc(x)}">${esc(x)}</button>`).join("")}</div>
+  <div class="grid2" style="margin-top:10px"><button type="button" class="primary" id="clMic" style="min-height:64px;font-size:19px">🎤 Tap and talk</button><button type="button" id="clSpeak" aria-pressed="true">🔊 Read answers aloud</button></div>
+  <p class="hint" style="margin:6px 0 0">Try: "Add client Mary Johnson at 12 Oak Street, phone 615 555 0199" or "Add lead Tom Hall".</p>
+  <form id="clForm" class="cl-form"><label for="clIn" class="sr">Ask ${esc(BOT_NAME())}</label><input id="clIn" placeholder="Type or tap the keyboard mic 🎤" autocomplete="off"><button class="go" type="submit" aria-label="Ask">Ask</button></form>`);
+  s.classList.add("cl-sheet");const log=s.querySelector("#clLog"),inp=s.querySelector("#clIn");
+  const add=(t,who)=>{const d=document.createElement("div");d.className="cl-msg "+who;d.textContent=t;log.appendChild(d);log.scrollTop=log.scrollHeight;return d};
+  const ask=async q=>{q=q.trim();if(!q)return;add(q,"me");inp.value="";const w=add("*sharpening my answer…*","bot think");
+    const v=voiceAdd(q);let a;if(v){try{a=await voiceSave(v)}catch(e){a="I couldn't save that. Please try again."}}else a=await cloverAsk(q);
+    w.classList.remove("think");w.textContent=a;log.scrollTop=log.scrollHeight;speak(a)};
+  const mic=s.querySelector("#clMic"),spk=s.querySelector("#clSpeak");
+  spk.setAttribute("aria-pressed",local.read("speak",true));spk.onclick=()=>{const on=!local.read("speak",true);local.write("speak",on);spk.setAttribute("aria-pressed",on);if(!on)try{speechSynthesis.cancel()}catch(e){}};
+  if(Rec){let r=null;mic.onclick=()=>{if(r){r.stop();return}r=new Rec();r.lang="en-US";r.interimResults=true;r.maxAlternatives=1;mic.classList.add("live");mic.textContent="● Listening… tap to stop";
+    r.onresult=e=>{const t=[...e.results].map(x=>x[0].transcript).join(" ");inp.value=t;if(e.results[e.results.length-1].isFinal){r.stop();ask(t)}};
+    r.onerror=e=>{add(e.error==="not-allowed"?"Microphone access is off. Allow the microphone for this site in Chrome's settings, then try again.":"I didn't catch that. Tap the mic and try again.","bot")};
+    r.onend=()=>{r=null;mic.classList.remove("live");mic.textContent="🎤 Tap and talk"};r.start()}}
+  else mic.onclick=()=>add("Tap the text box, then the 🎤 microphone on your keyboard to talk.","bot");
+  s.querySelector("#clForm").onsubmit=e=>{e.preventDefault();ask(inp.value)};
+  s.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>ask(b.dataset.q))}
+
+/* ----- website editor (what customers see) ----- */
+const SITE_DEFAULTS={
+ "heroBadge": "Making Lawns Loveable",
+ "heroTitle": "Give your lawn a powerup with PowerBlade",
+ "heroText": "Expert lawn care and landscaping for homes and businesses across Gallatin, Hendersonville and Greater Nashville.",
+ "heroImg": "https://powerbladelawncare.com/wp-content/uploads/2024/01/senior-african-american-couple-spending-time-in-ga.jpg",
+ "bannerServices": "https://powerbladelawncare.com/wp-content/uploads/2024/01/row-of-traditional-suburban-homes-with-lush-green-front-lawns-in-nice-residential-neighborhood.jpg",
+ "bannerQuote": "https://powerbladelawncare.com/wp-content/uploads/2024/04/gardener-mowing-grass-and-cleaning-backyard-garden.jpg",
+ "bannerContact": "https://powerbladelawncare.com/wp-content/uploads/2024/04/modern-house-with-beauty-garden.jpg",
+ "services": [
+  {
+   "name": "Lawn Mowing & Trimming",
+   "desc": "Consistent mowing and precise edging for a crisp, clean lawn that stands out.",
+   "img": "https://powerbladelawncare.com/wp-content/uploads/2024/04/gardener-mowing-grass-and-cleaning-backyard-garden-1536x1024.jpg"
+  },
+  {
+   "name": "Leaf Removal & Mulching",
+   "desc": "Clear the leaves and debris and feed your soil so the yard stays healthy every season.",
+   "img": "https://powerbladelawncare.com/wp-content/uploads/2024/04/fallen-leaves-near-houses-are-being-cleaned-by-a-municipal-worker-in-the-autumn--1536x1025.jpg"
+  },
+  {
+   "name": "Hedge Trimming",
+   "desc": "Hedges carefully shaped to sharpen the look of your whole yard.",
+   "img": "https://powerbladelawncare.com/wp-content/uploads/2024/04/cutting-bushes-with-hedge-trimmer-gardener-is-trimming-branches-1536x1008.jpg"
+  },
+  {
+   "name": "Gutter Cleaning",
+   "desc": "Debris cleared out so water drains properly and your home stays protected.",
+   "img": "https://powerbladelawncare.com/wp-content/uploads/2024/04/rain-gutters-pressure-cleaning-1536x1025.jpg"
+  },
+  {
+   "name": "Landscaping",
+   "desc": "From design to installation, we turn your outdoor space into the yard you picture.",
+   "img": "https://powerbladelawncare.com/wp-content/uploads/2024/04/colorful-garden-landscape-and-grassy-lawn-1536x1025.jpg"
+  },
+  {
+   "name": "Pressure Washing",
+   "desc": "Years of dirt and grime lifted off siding, walks and drives.",
+   "img": "https://powerbladelawncare.com/wp-content/uploads/2024/04/house-front-washing-cleaning-with-high-pressure-water-blaster-1536x1024.jpg"
+  },
+  {
+   "name": "Tree Trimming",
+   "desc": "Pruning that keeps trees healthy and good looking.",
+   "img": "https://powerbladelawncare.com/wp-content/uploads/2024/01/hastings-house-lawn.jpg"
+  },
+  {
+   "name": "Tree & Brush Removal",
+   "desc": "Unwanted trees and overgrowth cleared for a safer, cleaner property.",
+   "img": "https://powerbladelawncare.com/wp-content/uploads/2024/04/on-the-lawn.jpg"
+  },
+  {
+   "name": "Aeration & Seeding",
+   "desc": "Loosen compacted soil and seed for thicker, greener grass.",
+   "img": "https://powerbladelawncare.com/wp-content/uploads/2024/04/lawn-aerator-job-for-controlling-lawn-thatch-and-soil-compaction.jpg"
+  },
+  {
+   "name": "Mulch Application",
+   "desc": "Fresh mulch to hold moisture, block weeds and finish your beds.",
+   "img": "https://powerbladelawncare.com/wp-content/uploads/2024/04/modern-house-with-beauty-garden.jpg"
+  },
+  {
+   "name": "Sod Installation",
+   "desc": "New sod for an instantly green lawn.",
+   "img": "https://powerbladelawncare.com/wp-content/uploads/2024/01/hastings-house-lawn.jpg"
+  },
+  {
+   "name": "Junk Removal",
+   "desc": "We haul away the stuff you're done with.",
+   "img": "https://powerbladelawncare.com/wp-content/uploads/2024/01/row-of-traditional-suburban-homes-with-lush-green-front-lawns-in-nice-residential-neighborhood.jpg"
+  }
+ ],
+ "areas": [
+  "Gallatin",
+  "Hendersonville",
+  "Nashville",
+  "Goodlettsville",
+  "Madison",
+  "White House",
+  "Portland",
+  "Mount Juliet"
+ ],
+ "hours": [
+  null,
+  [
+   9,
+   17
+  ],
+  [
+   9,
+   17
+  ],
+  [
+   9,
+   17
+  ],
+  [
+   9,
+   17
+  ],
+  [
+   9,
+   13
+  ],
+  null
+ ],
+ "phone": "(615) 587-2226",
+ "email": "PowerBladeLawncare@gmail.com"
+};
+const DAYN=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+let SITE=null;
+function siteLoad(){try{SITE=JSON.parse(localStorage.getItem("pb_content")||"null")}catch(e){}SITE=SITE||JSON.parse(JSON.stringify(SITE_DEFAULTS));return SITE}
+function siteSave(msg){try{localStorage.setItem("pb_content",JSON.stringify(SITE));msg&&toast(msg)}catch(e){toast("Phone storage is full. Use smaller photos or remove one.")}}
+const hh=n=>String(Math.floor(n)).padStart(2,"0")+":"+String(Math.round(n%1*60)).padStart(2,"0");
+const thumb=(src,key,label)=>`<div class="card" style="padding:10px;gap:8px"><div style="aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:var(--line)"><img src="${esc(src)}" alt="${esc(label)}" style="width:100%;height:100%;object-fit:cover" referrerpolicy="no-referrer"></div>
+  <div class="row"><label class="btn small" style="flex-direction:row;flex:1">📷 Change photo<input type="file" accept="image/*" data-photo="${key}" style="position:absolute;opacity:0;width:1px;height:1px;min-height:0;padding:0"></label>
+  <button type="button" class="small" data-restore="${key}">Original</button></div></div>`;
+function vSite(){const c=siteLoad();
+  return `${back}<h2>Website editor</h2><p class="hint">Change what customers see on the PowerBlade website and app. Your original photos are always one tap away.</p>
+  <form id="siteform" style="margin-top:12px">
+  <h3>Top of the home page</h3>
+  ${thumb(c.heroImg,"heroImg","Cover photo")}
+  <label for="se_heroBadge">Small banner<input id="se_heroBadge" data-f="heroBadge" value="${esc(c.heroBadge)}"></label>
+  <label for="se_heroTitle">Headline<input id="se_heroTitle" data-f="heroTitle" value="${esc(c.heroTitle)}"></label>
+  <label for="se_heroText">Intro sentence<textarea id="se_heroText" data-f="heroText">${esc(c.heroText)}</textarea></label>
+  <h3>Services</h3><p class="hint">The first 8 with photos appear as photo buttons on the home page.</p>
+  <div class="list">${c.services.map((v,i)=>`<div class="card" style="padding:12px;gap:8px">
+    <div class="row"><b class="grow">${i+1}. ${esc(v.name)}</b><button type="button" class="small" data-mv="${i}" data-d="-1" aria-label="Move up">▲</button><button type="button" class="small" data-mv="${i}" data-d="1" aria-label="Move down">▼</button></div>
+    ${v.img?thumb(v.img,"svc:"+i,v.name):`<label class="btn small" style="flex-direction:row">📷 Add photo<input type="file" accept="image/*" data-photo="svc:${i}" style="position:absolute;opacity:0;width:1px;height:1px;min-height:0;padding:0"></label>`}
+    <label for="sn_${i}">Name<input id="sn_${i}" data-svc="${i}" data-k="name" value="${esc(v.name)}"></label>
+    <label for="sd_${i}">Description<textarea id="sd_${i}" data-svc="${i}" data-k="desc">${esc(v.desc)}</textarea></label>
+    <button type="button" class="small" data-rmsvc="${i}">Remove service</button></div>`).join("")}</div>
+  <button type="button" class="primary full" data-addsvc="1">+ Add a service</button>
+  <h3>Section photos</h3>
+  ${thumb(c.bannerServices,"bannerServices","Services page photo")}${thumb(c.bannerQuote,"bannerQuote","Quote page photo")}${thumb(c.bannerContact,"bannerContact","Contact page photo")}
+  <h3>Contact &amp; hours</h3>
+  <div class="grid2"><label for="se_phone">Business phone<input id="se_phone" data-f="phone" type="tel" value="${esc(c.phone)}"></label><label for="se_email">Email<input id="se_email" data-f="email" type="email" value="${esc(c.email)}"></label></div>
+  <label for="se_areas">Cities you serve (comma separated)<textarea id="se_areas" data-f="areas">${esc((c.areas||[]).join(", "))}</textarea></label>
+  <div class="items">${c.hours.map((h,d)=>`<div class="item" style="grid-template-columns:52px 1fr 1fr 90px"><span class="lbl">${DAYN[d]}</span>
+    <input type="time" data-hr="${d}" data-p="0" value="${h?hh(h[0]):""}" ${h?"":"disabled"} aria-label="${DAYN[d]} opens"><input type="time" data-hr="${d}" data-p="1" value="${h?hh(h[1]):""}" ${h?"":"disabled"} aria-label="${DAYN[d]} closes">
+    <label style="flex-direction:row;gap:6px;font-size:15px;align-items:center"><input type="checkbox" data-closed="${d}" ${h?"":"checked"} style="width:22px;height:22px;min-height:0">Closed</label></div>`).join("")}</div>
+  <div class="grid2"><a class="btn go" href="index.html" target="_blank" rel="noopener" id="sePreview">See it on the site</a><button type="button" data-site="export">Save file to publish</button></div>
+  <button type="button" class="full" data-site="reset">Restore everything to the originals</button>
+  <p class="hint">Edits show right away on this phone. Publishing to every customer turns on once the cloud connection is set up.</p>
+  </form>`}
+async function shrinkPhoto(file){const bm=await createImageBitmap(file);const W=Math.min(1400,bm.width),H=Math.round(bm.height*W/bm.width);const c=document.createElement("canvas");c.width=W;c.height=H;c.getContext("2d").drawImage(bm,0,0,W,H);return c.toDataURL("image/jpeg",.8)}
+document.addEventListener("input",e=>{if(!e.target.closest("#siteform"))return;const t=e.target;siteLoad();
+  if(t.dataset.f)SITE[t.dataset.f]=t.dataset.f==="areas"?t.value.split(",").map(x=>x.trim()).filter(Boolean):t.value;
+  if(t.dataset.svc)SITE.services[+t.dataset.svc][t.dataset.k]=t.value;
+  if(t.dataset.hr){const h=SITE.hours[+t.dataset.hr];if(h&&t.value){const[a,b]=t.value.split(":").map(Number);h[+t.dataset.p]=a+b/60}}
+  siteSave()});
+document.addEventListener("change",async e=>{if(e.target.id==="shelp"&&e.target.files[0]){try{const bm=await createImageBitmap(e.target.files[0]),S=512,c=document.createElement("canvas");c.width=c.height=S;const k=Math.max(S/bm.width,S/bm.height);c.getContext("2d").drawImage(bm,(S-bm.width*k)/2,(S-bm.height*k)/2.6,bm.width*k,bm.height*k);localStorage.setItem("pb_helperImg",c.toDataURL("image/jpeg",.88));toast("Helper picture updated");location.reload()}catch(err){toast("That picture couldn't be used. Try a JPG or PNG.")}}});
+document.addEventListener("click",e=>{if(e.target.id==="shelpx"){try{localStorage.removeItem("pb_helperImg")}catch(_){}toast("Picture removed");location.reload()}});
+document.addEventListener("change",async e=>{const t=e.target;if(!t.closest("#siteform"))return;siteLoad();
+  if(t.dataset.closed){const d=+t.dataset.closed;SITE.hours[d]=t.checked?null:(SITE_DEFAULTS.hours[d]||[9,17]);siteSave();go();return}
+  if(t.dataset.photo&&t.files[0]){toast("Adding photo…");try{const url=await shrinkPhoto(t.files[0]);const k=t.dataset.photo;if(k.startsWith("svc:"))SITE.services[+k.slice(4)].img=url;else SITE[k]=url;siteSave("Photo updated");go()}catch(err){toast("That photo couldn't be used. Try a JPG or PNG.")}}});
+document.addEventListener("click",e=>{const t=e.target.closest("#siteform [data-restore],#siteform [data-mv],#siteform [data-addsvc],#siteform [data-rmsvc],#siteform [data-site]");if(!t)return;siteLoad();
+  if(t.dataset.restore){const k=t.dataset.restore;if(k.startsWith("svc:")){const i=+k.slice(4),orig=SITE_DEFAULTS.services.find(x=>x.name===SITE.services[i].name);SITE.services[i].img=orig?orig.img:""}else SITE[k]=SITE_DEFAULTS[k];siteSave("Original photo restored");go()}
+  if(t.dataset.mv){const i=+t.dataset.mv,j=i+(+t.dataset.d);if(j>=0&&j<SITE.services.length){[SITE.services[i],SITE.services[j]]=[SITE.services[j],SITE.services[i]];siteSave();go()}}
+  if(t.dataset.addsvc){SITE.services.push({name:"New service",desc:"Describe what's included.",img:""});siteSave("Service added");go()}
+  if(t.dataset.rmsvc){if(t.dataset.armed){SITE.services.splice(+t.dataset.rmsvc,1);siteSave("Service removed");go()}else{t.dataset.armed=1;t.textContent="Tap again to remove"}}
+  if(t.dataset.site==="reset"){if(t.dataset.armed){localStorage.removeItem("pb_content");SITE=null;toast("Restored to originals");go()}else{t.dataset.armed=1;t.textContent="Tap again to restore everything"}}
+  if(t.dataset.site==="export"){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(SITE,null,1)],{type:"application/json"}));a.download="content.json";a.click();toast("Saved content.json. Send it to your web person to publish.")}});
+
+/* ----- crew ----- */
+function crewJobs(name,date){return state.jobs.filter(j=>j.date===date&&j.status==="scheduled"&&(j.crew||"Owner")===name).sort((a,b)=>(a.order??0)-(b.order??0))}
+function vCrew(){const t=todayISO();const list=[...state.crew].sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+  const un=state.jobs.filter(j=>j.date===t&&j.status==="scheduled"&&!j.crew).length;
+  return `${back}<h2>Crew</h2><button class="primary full" data-act="newcrew">+ Add crew member</button>
+  ${un?`<p class="note" style="margin-top:12px">${un} of today's jobs have no crew assigned. Open a job and pick a crew.</p>`:""}
+  <div class="list" style="margin-top:12px">${list.length?list.map(c=>{const js=crewJobs(c.name,t),hrs=state.jobs.filter(j=>j.crew===c.name&&j.minutes&&(j.doneOn||j.date)>=addDays(t,-6)).reduce((s,j)=>s+j.minutes,0);return `<div class="card">
+    <div class="row"><div class="grow"><div class="name">${esc(c.name)}</div><div class="sub">${esc(c.role||"Crew")}${c.phone?" · "+esc(c.phone):""}</div></div><span class="tag">${js.length} stop${js.length===1?"":"s"} today</span></div>
+    <div class="sub">${js.length?js.map((j,i)=>`${i+1}. ${esc(j.clientName||"Walk-up")}`).join(" · "):"Nothing assigned today"} · ${Math.round(hrs/6)/10} hrs logged this week</div>
+    <div class="row">${js.length&&c.phone?`<button class="small go" data-act="crewroute" data-id="${c.id}">Text today's route</button>`:""}<button class="small" data-act="editcrew" data-id="${c.id}">Edit</button></div></div>`}).join(""):`<div class="empty">Add your crew so you can assign jobs and text each person their stops.</div>`}</div>`}
+function crewForm(x){const isNew=!x;x=x||{id:newId(),role:"Crew"};
+  const s=sheet(`<div class="row"><h2 class="grow">${isNew?"Add crew member":"Edit crew member"}</h2><button class="small" data-close>Close</button></div><form id="crf">
+    <label for="crn">Name<input id="crn" required value="${esc(x.name||"")}"></label>
+    <div class="grid2"><label for="crp">Phone<input id="crp" type="tel" value="${esc(x.phone||"")}"></label>
+    <label for="crr">Role<select id="crr">${["Crew lead","Crew","Trainee","Office"].map(r=>`<option${r===x.role?" selected":""}>${r}</option>`).join("")}</select></label></div>
+    <label for="crnotes">Notes (license, start date, skills)<input id="crnotes" value="${esc(x.notes||"")}"></label>
+    <button class="go full" type="submit">Save</button>${isNew?"":`<button type="button" id="crdel" class="full">Remove</button>`}</form>`);
+  const del=s.querySelector("#crdel");if(del)armed(del,"Tap again to remove",async()=>{await guard(remove("crew",x.id),"Removed");s.remove()});
+  s.querySelector("#crf").onsubmit=async e=>{e.preventDefault();try{await save("crew",x.id,{...clean(x),name:s.querySelector("#crn").value.trim(),phone:s.querySelector("#crp").value.trim(),role:s.querySelector("#crr").value,notes:s.querySelector("#crnotes").value});s.remove();toast("Saved");go()}catch(err){toast("Couldn't save. Try again.")}}}
+function crewRouteText(c){const js=crewJobs(c.name,todayISO()),addrs=js.map(j=>j.address).filter(Boolean);
+  return `${biz()} route for ${niceDate(todayISO())}\n\n${js.map((j,i)=>`${i+1}. ${j.clientName||"Walk-up"} - ${j.address||"no address"}\n   ${(j.items||[]).map(it=>it.k==="custom"?(it.label||"Custom"):svc(it.k).label).join(", ")}${j.notes?"\n   Note: "+j.notes:""}`).join("\n")}${addrs.length?"\n\nMap: "+routeLink(addrs):""}`}
+
+/* ----- text templates ----- */
+const DEFAULT_TEXTS={
+  onway:["On my way","Hi {first}, this is {business}. Our crew is headed to {address} now. See you soon!"],
+  late:["Running late","Hi {first}, {business} here. We're running a little behind today and will be there as soon as we can. Thank you for your patience!"],
+  done:["Job done + total","Hi {first}, your service at {address} is complete. Total: {total}. {payinfo} Thank you for choosing {business}!"],
+  remind:["Payment reminder","Hi {first}, friendly reminder from {business}: {total} for service on {date} is still open. {payinfo} Questions? Call {phone}."],
+  review:["Ask for a review","Hi {first}, thank you for choosing {business}! If you love your yard, would you leave us a quick Google review? It means a lot to a local business."],
+  followup:["Estimate follow-up","Hi {first}, {business} here following up on your free estimate. Any questions, or would you like to get on the schedule?"],
+  rain:["Rain delay","Hi {first}, rain is moving in, so {business} will take care of your yard on {next}. Thank you for understanding!"],
+  season:["Seasonal services","Hi {first}! {business} is scheduling leaf removal, aeration and overseeding. Want us to add your yard? Reply YES."],
+  welcome:["Welcome new client","Hi {first}, welcome to {business}! Save this number. We'll text before each visit, and you can reply here anytime."]
+};
+const texts=()=>{const o=state.settings.texts||{};const r={};for(const k in DEFAULT_TEXTS)r[k]=[DEFAULT_TEXTS[k][0],o[k]||DEFAULT_TEXTS[k][1]];return r};
+function fillText(tpl,c,j){const st=state.settings;const first=((c&&c.name)||(j&&j.clientName)||"there").replace(/^Sample:\s*/,"").split(" ")[0];
+  return tpl.replace(/\{first\}/g,first).replace(/\{business\}/g,biz()).replace(/\{address\}/g,(j&&j.address)||(c&&c.address)||"your property")
+   .replace(/\{total\}/g,j?money(jobTotal(j)):"").replace(/\{date\}/g,j?niceDate(j.date):"").replace(/\{next\}/g,niceDate(addDays(todayISO(),1)))
+   .replace(/\{phone\}/g,st.phone||DEF.phone).replace(/\{payinfo\}/g,st.payInfo?"Pay by: "+st.payInfo+".":"").replace(/\s+\./g,".").replace(/ {2,}/g," ").trim()}
+const smsHref=(phone,body)=>`sms:${(phone||"").replace(/[^\d+]/g,"")}?body=${encodeURIComponent(body)}`;
+function textSheet(c,j,key){const T=texts();key=key||(j?(j.status==="done"?"remind":j.status==="paid"?"review":"onway"):(c&&c.stage==="lead"?"followup":"season"));
+  const phone=(c&&c.phone)||(state.clients.find(x=>x.id===(j&&j.clientId))||{}).phone||"";c=c||state.clients.find(x=>x.id===(j&&j.clientId));
+  const s=sheet(`<div class="row"><h2 class="grow">Text ${esc(((c&&c.name)||(j&&j.clientName)||"client").replace(/^Sample:\s*/,""))}</h2><button class="small" data-close>Close</button></div>
+    <div class="chips" id="tchips">${Object.entries(T).map(([k,[l]])=>`<button class="small" data-k="${k}" aria-pressed="${k===key}">${l}</button>`).join("")}</div>
+    <label for="tbody" style="margin-top:12px">Message (edit anything)<textarea id="tbody" style="min-height:150px"></textarea></label>
+    ${phone?`<p class="sub" style="margin:6px 0">To: ${esc(phone)}</p>`:`<p class="note">No phone on file. Add one in the client's details.</p>`}
+    <div class="grid2"><a class="btn go" id="tsend" href="#">Open in Messages</a><button id="tcopy">Copy text</button></div>`);
+  const ta=s.querySelector("#tbody"),send=s.querySelector("#tsend");
+  const set=k=>{key=k;ta.value=fillText(T[k][1],c,j);upd();s.querySelectorAll("#tchips button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.k===k))};
+  const upd=()=>send.href=smsHref(phone,ta.value);
+  s.querySelector("#tchips").onclick=e=>{const b=e.target.closest("[data-k]");if(b)set(b.dataset.k)};ta.oninput=upd;set(key);
+  const log=()=>{if(c){const L=[...(c.log||[]),{at:Date.now(),how:"Text",note:T[key][0]}].slice(-50);save("clients",c.id,{...clean(c),log:L,lastContact:Date.now()}).catch(()=>{})}};
+  send.addEventListener("click",log);s.querySelector("#tcopy").onclick=()=>{copy(ta.value);log()}}
+function vTexts(){const T=texts();return `${back}<h2>Text templates</h2><p class="hint">Words in braces fill in automatically: {first} {address} {total} {date} {next} {business} {phone} {payinfo}</p>
+  <form id="tform" style="margin-top:12px">${Object.entries(T).map(([k,[l,b]])=>`<label for="tx_${k}">${l}<textarea id="tx_${k}" data-tk="${k}">${esc(b)}</textarea></label>`).join("")}
+  <button class="go full" type="submit">Save templates</button><button type="button" class="full" data-act="resettexts">Restore defaults</button></form>`}
+
+/* ----- client history (CRM) ----- */
+function historySheet(c){const js=state.jobs.filter(j=>j.clientId===c.id).sort((a,b)=>b.date.localeCompare(a.date));const st=clientStats(c);
+  const s=sheet(`<div class="row"><h2 class="grow">${esc(c.name)}</h2><button class="small" data-close>Close</button></div>
+    <div class="stats"><div class="stat"><b>${st.visits}</b><span>Visits</span></div><div class="stat"><b>${money(st.paid)}</b><span>Lifetime</span></div><div class="stat"><b>${money(js.filter(j=>j.status==="done").reduce((a,j)=>a+jobTotal(j),0))}</b><span>Owed</span></div></div>
+    <p class="sub">${esc(c.address||"")}${c.phone?" · "+esc(c.phone):""}${c.email?" · "+esc(c.email):""}${c.gate?" · Gate "+esc(c.gate):""}</p>
+    <h3>Log contact</h3><div class="row"><button class="small" data-log="Call">Called</button><button class="small" data-log="Text">Texted</button><button class="small" data-log="Visit">Visited</button><button class="small" data-log="Email">Emailed</button></div>
+    <label for="lognote" style="margin-top:8px">Note<input id="lognote" placeholder="Wants hedges done next month"></label>
+    <h3 style="margin-top:14px">Contact history</h3><div class="list" id="logl">${(c.log||[]).slice().reverse().map(l=>`<div class="sub">${new Date(l.at).toLocaleDateString(undefined,{month:"short",day:"numeric"})} · ${esc(l.how)}${l.note?" · "+esc(l.note):""}</div>`).join("")||'<p class="hint">No contact logged yet.</p>'}</div>
+    <h3 style="margin-top:14px">Jobs</h3><div class="list">${js.map(j=>`<div class="sub">${niceDate(j.date)} · ${money(jobTotal(j))} · ${j.status==="done"?"owed":j.status}</div>`).join("")||'<p class="hint">No jobs yet.</p>'}</div>
+    <div class="grid2" style="margin-top:14px"><button class="go" data-act2="text">Text</button><button data-act2="job">+ Job</button></div>`);
+  s.addEventListener("click",async e=>{const lg=e.target.closest("[data-log]");if(lg){const L=[...(c.log||[]),{at:Date.now(),how:lg.dataset.log,note:s.querySelector("#lognote").value.trim()}].slice(-50);await guard(save("clients",c.id,{...clean(c),log:L,lastContact:Date.now()}),"Logged");s.remove();return}
+    const a=e.target.closest("[data-act2]");if(!a)return;s.remove();if(a.dataset.act2==="text")textSheet(c);else jobForm({clientId:c.id})})}
+
+/* ----- equipment ----- */
+function vEquip(){
+  const eq=[...state.equipment].sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+  return `${back}<h2>Equipment</h2><button class="primary full" data-act="newequip">+ Add equipment</button>
+  <div class="list" style="margin-top:12px">${eq.length?eq.map(e=>{const since=(+e.hours||0)-(+e.lastService||0),due=since>=(+e.interval||50);return `<div class="card">
+    <div class="row"><div class="name grow">${esc(e.name)}</div>${due?'<span class="pill due">Service due</span>':`<span class="tag">${Math.max(0,(+e.interval||50)-since)} hrs to service</span>`}</div>
+    <div class="sub">${+e.hours||0} total hours · service every ${+e.interval||50} hrs${e.notes?" · "+esc(e.notes):""}</div>
+    <div class="row"><button class="small" data-act="hrs" data-id="${e.id}" data-n="1">+1 hr</button><button class="small" data-act="hrs" data-id="${e.id}" data-n="4">+4 hrs</button><button class="small go" data-act="serviced" data-id="${e.id}">Serviced today</button><button class="small" data-act="editequip" data-id="${e.id}">Edit</button></div></div>`}).join(""):`<div class="empty">Track mower, trimmer and blower hours so oil changes and blade sharpening never get missed.</div>`}</div>`}
+
+/* ----- AI helper ----- */
+function vAI(){
+  if(!sampleFn)return `${back}<h2>AI helper</h2><div class="empty">The AI helper works when this app is opened from its Claude link.</div>`;
+  const presets=[["Unpaid follow-up","Write a short, friendly text reminding a customer their lawn service invoice is unpaid."],["Fall upsell","Write a short text offering existing customers leaf cleanup, aeration and overseeding this season."],["Review request","Write a short text asking a happy customer for a Google review."],["Price a job","I need to price a landscaping job. Ask me nothing; give a price range and how you got it for: "],["Door hanger","Write door hanger copy for a lawn care business: headline, 3 bullets, offer, call to action."]];
+  return `${back}<h2>AI helper</h2>
+  <div class="chips">${presets.map(([l,p])=>`<button class="small" data-act="preset" data-p="${esc(p)}">${l}</button>`).join("")}</div>
+  <form id="aiform" style="margin-top:12px"><label for="aiq">Ask anything about the business<textarea id="aiq" placeholder="Tap the keyboard mic and talk">${esc(state.aiq||"")}</textarea></label>
+  <button class="go full" type="submit" id="aigo">Ask</button></form>
+  ${state.aia?`<h3>Answer</h3><div class="answer" id="aia">${esc(state.aia)}</div><button class="full" data-act="copyai" style="margin-top:8px">Copy answer</button>`:""}`}
+async function askAI(q){
+  state.aiq=q;const ctl={};state.aia="Thinking…";render();
+  const s=svcs().filter(x=>x.k!=="custom").map(x=>`${x.label}: ${x.type==="area"?"$"+x.rate+"/sq ft min $"+x.min:x.type==="unit"?"$"+x.rate+" per "+x.unit:"$"+x.rate+" flat"}`).join("; ");
+  const prompt=`You help run ${biz()}, a lawn care and landscaping business${state.settings.phone?" (phone "+state.settings.phone+")":""}. Their price list: ${s}. Active clients: ${state.clients.filter(c=>c.stage!=="lead").length}. Keep answers short, plain and ready to send; no markdown symbols.\n\nRequest: ${q}`;
+  try{const r=await sampleFn(prompt,{cache:false,onText:({text})=>{state.aia=text;const el=document.getElementById("aia");if(el)el.textContent=text}});state.aia=r.text}
+  catch(e){state.aia=e.code==="rate_limited"?"Too many requests. Wait a minute and try again.":e.code==="not_granted"?"AI access wasn't allowed for this page.":"Couldn't get an answer. Try again."}
+  render()}
+
+/* ----- settings ----- */
+function vSettings(){const st=state.settings;
+  return `${back}<h2>Business &amp; rates</h2><form id="sform">
+    <label for="sname">Business name<input id="sname" value="${esc(st.name||"PowerBlade Lawn Care")}"></label>
+    <label for="stag">Tagline<input id="stag" value="${esc(st.tagline||"Making Lawns Loveable")}"></label>
+    <div class="grid2"><label for="sphone">Business phone<input id="sphone" type="tel" value="${esc(st.phone||DEF.phone)}"></label>
+    <label for="stax">Sales tax %<input id="stax" type="number" inputmode="decimal" step="0.01" value="${esc(st.tax??"")}" placeholder="0"></label></div>
+    <label for="spay">How customers pay you (shows on invoices)<input id="spay" value="${esc(st.payInfo||"")}" placeholder="Zelle: name@email.com · Cash App: $handle"></label>
+    <label for="screws">Crews or workers (comma separated)<input id="screws" value="${esc((st.crews||[]).join(", "))}" placeholder="Crew A, Marcus"></label>
+    <h3>Service rates</h3><p class="hint">By-size services use rate per sq ft with a minimum. Others are flat or per unit.</p>
+    <div class="items">${svcs().filter(s=>s.k!=="custom").map(s=>`<div class="item" style="grid-template-columns:1fr 100px 90px"><span class="lbl">${esc(s.label)}<br><span class="sub">${s.type==="area"?"$/sq ft · min":s.type==="unit"?"$ per "+s.unit:"$ flat"}</span></span>
+      <input type="number" step="0.001" inputmode="decimal" data-rate="${s.k}" value="${s.rate}" aria-label="${esc(s.label)} rate">
+      ${s.type==="area"?`<input type="number" inputmode="decimal" data-min="${s.k}" value="${s.min}" aria-label="${esc(s.label)} minimum">`:"<span></span>"}</div>`).join("")}</div>
+    <label for="sbot">Assistant's name<input id="sbot" value="${esc(st.botName||"Mr. Ed")}"></label>
+    <div class="row"><span class="grow" style="font-weight:700">Helper picture</span>${CLOVER_SVG(64)}</div>
+    <div class="grid2"><label class="btn small" style="flex-direction:row">📷 Change helper picture<input id="shelp" type="file" accept="image/*" style="position:absolute;opacity:0;width:1px;height:1px;min-height:0;padding:0"></label><button type="button" class="small" id="shelpx">Remove picture</button></div>
+    <label for="saic">AI connection code (from your web person)<input id="saic" type="password" autocomplete="off" value="${esc(local.read("aiCode","")||"")}"></label>
+    <label for="spin">Owner PIN for this phone (optional)<input id="spin" type="password" inputmode="numeric" maxlength="8" placeholder="4–8 digits" value="${esc(local.read("pin","")||"")}"></label>
+    <button class="go full" type="submit">Save settings</button></form>
+    ${!state.cloud&&state.clients.some(c=>c.example)?`<button class="full" id="cleardemo" style="margin-top:12px">Clear sample data</button>`:""}`}
+
+function render(){
+  document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-current",b.dataset.tab===state.tab?"page":"false"));
+  document.getElementById("bizname").innerHTML=`Owner Panel<small>${esc(state.settings.tagline||"Making Lawns Loveable")}</small>`;
+  if(document.querySelector(".sheet")&&!state._force)return;
+  const live=document.activeElement&&document.activeElement.closest&&document.activeElement.closest("#qform,#sform,#aiform,#tform,#siteform");
+  if(live&&!state._force)return;
+  const focusId=document.activeElement&&document.activeElement.id;
+  state._force=false;
+  document.getElementById("view").innerHTML=({today:vToday,schedule:vSchedule,clients:vClients,money:vMoney,more:vMore})[state.tab]();
+  if(focusId==="cq"){const el=document.getElementById("cq");el.focus();el.setSelectionRange(el.value.length,el.value.length)}
+  const rain=document.getElementById("rain");
+  if(rain)armed(rain,"Tap again to move all",async()=>{const t=todayISO(),js=state.jobs.filter(j=>j.date===t&&j.status==="scheduled");for(const j of js)await save("jobs",j.id,{...clean(j),date:addDays(t,1)}).catch(()=>{});toast(`Moved ${js.length} jobs to tomorrow`)});
+}
+const go=()=>{state._force=true;render()};
+document.addEventListener("click",e=>{if(e.target.id==="cleardemo"){const b=e.target;if(b.dataset.a){COLS.forEach(c=>local.write(c,local.read(c,[]).filter(x=>!x.example)));COLS.forEach(c=>state[c]=local.read(c,[]));state.demo=false;toast("Sample data cleared");go()}else{b.dataset.a=1;b.textContent="Tap again to clear samples"}}});
+function seedDemo(){const t=todayISO(),now=Date.now();
+  const C=[["c1","Sample: Miller Home","104 Example Ct, Gallatin, TN",6500,"Weekly, gate on left"],["c2","Sample: Oak Ridge HOA","Example Blvd, Hendersonville, TN",42000,"Common areas + entrance beds"],["c3","Sample: Davis Family","22 Sample Ln, Goodlettsville, TN",9000,"Dog in back yard"],["c4","Sample: Grace Chapel","500 Demo Rd, White House, TN",18000,"Mow before Sunday"]];
+  local.write("clients",[...C.map(([id,name,address,lot,notes])=>({id,name,address,lot,notes,phone:"(615) 555-01"+id.slice(1).padStart(2,"0"),stage:"active",example:true,created:now})),
+    {id:"c5",name:"Sample: Hall lead",address:"9 Prospect Dr, Gallatin, TN",lot:7500,stage:"lead",source:"Facebook",leadStatus:"Estimate sent",example:true,created:now}]);
+  const L=(k,lot,qty)=>{const it={k,qty:qty||1};it.price=linePrice(it,lot);return it};
+  const J=(id,c,date,keys,status,extra)=>{const cl=C.find(x=>x[0]===c);const items=keys.map(k=>Array.isArray(k)?L(k[0],cl[3],k[1]):L(k,cl[3]));const tt=totals(items,0,0);return {id,clientId:c,clientName:cl[1],address:cl[2],date,items,disc:0,tax:0,total:tt.total,repeat:"weekly",status,example:true,created:now,order:+id.slice(1),...extra}};
+  local.write("jobs",[J("j1","c1",t,["mow","edge","trim","blow"],"scheduled",{crew:"Marcus (sample)"}),J("j2","c3",t,["mow","edge","trim","blow",["mulch",3]],"scheduled",{repeat:"none"}),J("j3","c4",t,["mow","trim","blow"],"scheduled",{crew:"Andre (sample)"}),
+    J("j4","c2",addDays(t,1),["hoa","hedges"],"scheduled"),J("j5","c1",addDays(t,-7),["mow","edge","trim","blow"],"paid",{paidMethod:"Zelle",paidOn:addDays(t,-6)}),
+    J("j6","c2",addDays(t,-6),["hoa","leaves"],"done"),J("j7","c3",addDays(t,-14),["aerate","seed"],"paid",{paidMethod:"Card",paidOn:addDays(t,-12),repeat:"none"})]);
+  local.write("crew",[{id:"w1",name:"Marcus (sample)",phone:"(615) 555-0142",role:"Crew lead",example:true},{id:"w2",name:"Andre (sample)",phone:"(615) 555-0177",role:"Crew",example:true}]);
+  local.write("expenses",[{id:"e1",date:addDays(t,-2),cat:"Fuel",amount:68.4,note:"Gas cans + truck",example:true},{id:"e2",date:addDays(t,-9),cat:"Materials",amount:120,note:"Mulch, 4 yds",example:true}]);
+  local.write("equipment",[{id:"q1",name:"Zero-turn 60in",hours:148,lastService:100,interval:50,notes:"10W-30",example:true},{id:"q2",name:"Backpack blower",hours:61,lastService:50,interval:25,example:true}]);
+}
+
+/* ===== sheets ===== */
+function bindItems(s,prefix,getItems,getSqft,onChange){
+  const box=s.querySelector("#"+prefix+"items").parentNode;
+  box.addEventListener("input",e=>{const row=e.target.closest(".item");if(!row)return;const it=getItems()[+row.dataset.n];
+    if(e.target.classList.contains(prefix+"qty")){it.qty=+e.target.value||0;it.price=linePrice(it,getSqft());row.querySelector("."+prefix+"price").value=it.price}
+    if(e.target.classList.contains(prefix+"price"))it.price=+e.target.value||0;
+    if(e.target.classList.contains(prefix+"lbl"))it.label=e.target.value;onChange(false)});
+  box.addEventListener("change",e=>{if(e.target.id===prefix+"add"&&e.target.value){const it={k:e.target.value,qty:1};it.price=linePrice(it,getSqft());getItems().push(it);onChange(true)}});
+  box.addEventListener("click",e=>{const rm=e.target.closest("[data-rm]");if(rm){getItems().splice(+rm.dataset.rm,1);onChange(true)}})}
+
+function jobForm(j){
+  const isNew=!j||!j.created;
+  j=JSON.parse(JSON.stringify(j||{}));j.id=j.id||newId();j.date=j.date||state.day||todayISO();j.status=j.status||"scheduled";j.repeat=j.repeat||"weekly";
+  if(!j.items){const c=state.clients.find(x=>x.id===j.clientId);j.items=["mow","edge","trim","blow"].map(k=>({k,qty:1}));j.items.forEach(i=>i.price=linePrice(i,c?.lot||7000))}
+  j.photos=j.photos||[];
+  const crews=state.crew.length?state.crew.map(c=>c.name):(state.settings.crews||[]);
+  const s=sheet(`<div class="row"><h2 class="grow">${isNew?"New job":"Edit job"}</h2><button class="small" data-close>Close</button></div><form id="jf">
+    <label for="jclient">Client<select id="jclient"><option value="">Walk-up job</option>${state.clients.map(c=>`<option value="${c.id}"${c.id===j.clientId?" selected":""}>${esc(c.name)}</option>`).join("")}</select></label>
+    <div class="grid2"><label for="jdate">Date<input id="jdate" type="date" value="${j.date}"></label>
+    <label for="jrepeat">Repeats<select id="jrepeat">${["none","weekly","biweekly","monthly"].map(r=>`<option${r===j.repeat?" selected":""}>${r}</option>`).join("")}</select></label></div>
+    ${crews.length?`<label for="jcrew">Crew<select id="jcrew"><option value="">Me</option>${crews.map(c=>`<option${c===j.crew?" selected":""}>${esc(c)}</option>`).join("")}</select></label>`:""}
+    <div id="jitemswrap">${itemsEditor(j.items,"j")}</div>
+    <div class="grid2"><button type="button" class="small" id="jreprice">Re-price from lawn size</button><label for="jdisc" style="font-size:15px">Discount ($)<input id="jdisc" type="number" inputmode="decimal" value="${j.disc||""}" placeholder="0"></label></div>
+    <div id="jtot">${totalsBox(totals(j.items,j.disc,state.settings.tax),"jtotal")}</div>
+    <label for="jnotes">Notes for the crew (gate code, dog, problem spots)<textarea id="jnotes">${esc(j.notes||"")}</textarea></label>
+    ${assets?`<div><div class="photos" id="jphotos">${j.photos.map(p=>`<img src="/_blob/${esc(p)}" alt="Job photo">`).join("")}</div>
+      <label for="jphoto" class="btn small" style="margin-top:8px;flex-direction:row">📷 Add before/after photo<input id="jphoto" type="file" accept="image/*" capture="environment" style="position:absolute;opacity:0;width:1px;height:1px;min-height:0;padding:0"></label></div>`:""}
+    <button class="go full" type="submit">Save job</button>
+    ${isNew?"":`<button type="button" id="jdel" class="full">Delete job</button>`}
+  </form>`);
+  const sqft=()=>state.clients.find(x=>x.id===s.querySelector("#jclient").value)?.lot||7000;
+  const refresh=re=>{if(re){s.querySelector("#jitemswrap").innerHTML=itemsEditor(j.items,"j")}s.querySelector("#jtot").innerHTML=totalsBox(totals(j.items,s.querySelector("#jdisc").value,state.settings.tax),"jtotal")};
+  bindItems(s,"j",()=>j.items,sqft,refresh);
+  s.querySelector("#jdisc").oninput=()=>refresh(false);
+  s.querySelector("#jreprice").onclick=()=>{j.items.forEach(i=>{if(i.k!=="custom")i.price=linePrice(i,sqft())});refresh(true)};
+  s.querySelector("#jclient").onchange=()=>{j.items.forEach(i=>{if(svc(i.k).type==="area")i.price=linePrice(i,sqft())});refresh(true)};
+  const ph=s.querySelector("#jphoto");
+  if(ph)ph.onchange=async()=>{const f=ph.files[0];if(!f)return;toast("Uploading photo…");try{const r=await assets.upload(f);j.photos.push(r.id);s.querySelector("#jphotos").insertAdjacentHTML("beforeend",`<img src="${esc(r.url)}" alt="Job photo">`);toast("Photo added. Save the job to keep it.")}catch(e){toast("Photo didn't upload. Try a smaller picture.")}};
+  const del=s.querySelector("#jdel");if(del)armed(del,"Tap again to delete",async()=>{await guard(remove("jobs",j.id),"Job deleted");s.remove()});
+  s.querySelector("#jf").onsubmit=async e=>{e.preventDefault();
+    const c=state.clients.find(x=>x.id===s.querySelector("#jclient").value);
+    const t=totals(j.items,s.querySelector("#jdisc").value,state.settings.tax);
+    const data={...clean(j),clientId:c?.id||"",clientName:c?.name||"",address:c?.address||"",date:s.querySelector("#jdate").value||todayISO(),repeat:s.querySelector("#jrepeat").value,
+      crew:s.querySelector("#jcrew")?.value||"",disc:t.disc,tax:t.tax,total:t.total,notes:s.querySelector("#jnotes").value,created:j.created||Date.now()};
+    try{await save("jobs",j.id,data);s.remove();toast("Job saved");go()}catch(err){toast("Couldn't save. Check your connection and try again.")}}}
+
+function clientForm(c,lead){
+  const isNew=!c;c=c||{id:newId(),stage:lead?"lead":"active"};
+  const s=sheet(`<div class="row"><h2 class="grow">${isNew?(c.stage==="lead"?"New lead":"New client"):"Edit "+(c.stage==="lead"?"lead":"client")}</h2><button class="small" data-close>Close</button></div><form id="cf">
+    <label for="cname">Name<input id="cname" required value="${esc(c.name||"")}" autocomplete="off"></label>
+    <label for="caddr">Property address<input id="caddr" value="${esc(c.address||"")}"></label>
+    <div class="grid2"><label for="cphone">Phone<input id="cphone" type="tel" value="${esc(c.phone||"")}"></label>
+    <label for="cemail">Email<input id="cemail" type="email" value="${esc(c.email||"")}"></label></div>
+    <div class="grid2"><label for="clot">Lawn size (sq ft)<input id="clot" type="number" inputmode="numeric" value="${esc(c.lot||"")}"></label>
+    <label for="cgate">Gate / access code<input id="cgate" value="${esc(c.gate||"")}"></label></div>
+    ${c.stage==="lead"?`<div class="grid2"><label for="csource">Lead source<select id="csource">${["Referral","Door knock","Facebook","Google","Nextdoor","Yard sign","Other"].map(o=>`<option${o===c.source?" selected":""}>${o}</option>`).join("")}</select></label>
+    <label for="cls">Status<select id="cls">${["New lead","Called","Estimate sent","Follow up","Lost"].map(o=>`<option${o===c.leadStatus?" selected":""}>${o}</option>`).join("")}</select></label></div>`:""}
+    <label for="cnotes">Notes (dog, sprinklers, preferences)<textarea id="cnotes">${esc(c.notes||"")}</textarea></label>
+    <button class="go full" type="submit">Save</button>${isNew?"":`<button type="button" id="cdel" class="full">Delete</button>`}</form>`);
+  const del=s.querySelector("#cdel");if(del)armed(del,"Tap again to delete",async()=>{await guard(remove("clients",c.id),"Deleted");s.remove()});
+  s.querySelector("#cf").onsubmit=async e=>{e.preventDefault();const v=id=>s.querySelector("#"+id)?.value.trim()||"";
+    const data={...clean(c),name:v("cname"),address:v("caddr"),phone:v("cphone"),email:v("cemail"),lot:+v("clot")||0,gate:v("cgate"),notes:s.querySelector("#cnotes").value,created:c.created||Date.now()};
+    if(c.stage==="lead"){data.source=v("csource");data.leadStatus=v("cls")}
+    try{await save("clients",c.id,data);s.remove();toast("Saved");go()}catch(err){toast("Couldn't save. Check your connection and try again.")}}}
+
+function expForm(x){const isNew=!x;x=x||{id:newId(),date:todayISO(),cat:"Fuel"};
+  const s=sheet(`<div class="row"><h2 class="grow">${isNew?"New expense":"Edit expense"}</h2><button class="small" data-close>Close</button></div><form id="ef">
+    <div class="chips">${EXP_CATS.map(c=>`<button type="button" class="small" data-cat="${c}" aria-pressed="${c===x.cat}">${c}</button>`).join("")}</div>
+    <div class="grid2"><label for="eamt">Amount ($)<input id="eamt" type="number" inputmode="decimal" step="0.01" required value="${x.amount??""}"></label>
+    <label for="edate">Date<input id="edate" type="date" value="${x.date}"></label></div>
+    <label for="enote">Note<input id="enote" value="${esc(x.note||"")}" placeholder="Shell gas, 5 gal"></label>
+    <button class="go full" type="submit">Save expense</button>${isNew?"":`<button type="button" id="edel" class="full">Delete</button>`}</form>`);
+  s.querySelectorAll("[data-cat]").forEach(b=>b.onclick=()=>{x.cat=b.dataset.cat;s.querySelectorAll("[data-cat]").forEach(o=>o.setAttribute("aria-pressed",o===b))});
+  const del=s.querySelector("#edel");if(del)armed(del,"Tap again to delete",async()=>{await guard(remove("expenses",x.id),"Deleted");s.remove()});
+  s.querySelector("#ef").onsubmit=async e=>{e.preventDefault();try{await save("expenses",x.id,{...clean(x),amount:+s.querySelector("#eamt").value||0,date:s.querySelector("#edate").value,note:s.querySelector("#enote").value,created:x.created||Date.now()});s.remove();toast("Expense saved");go()}catch(err){toast("Couldn't save. Check your connection and try again.")}}}
+
+function equipForm(x){const isNew=!x;x=x||{id:newId(),interval:50,hours:0,lastService:0};
+  const s=sheet(`<div class="row"><h2 class="grow">${isNew?"Add equipment":"Edit equipment"}</h2><button class="small" data-close>Close</button></div><form id="qf">
+    <label for="qn">Name<input id="qn" required value="${esc(x.name||"")}" placeholder="Zero-turn 54in"></label>
+    <div class="grid2"><label for="qh">Hour meter<input id="qh" type="number" inputmode="decimal" value="${x.hours}"></label>
+    <label for="qi">Service every (hrs)<input id="qi" type="number" inputmode="numeric" value="${x.interval}"></label></div>
+    <label for="qnotes">Notes (oil type, blade size, serial)<input id="qnotes" value="${esc(x.notes||"")}"></label>
+    <button class="go full" type="submit">Save</button>${isNew?"":`<button type="button" id="qdel" class="full">Delete</button>`}</form>`);
+  const del=s.querySelector("#qdel");if(del)armed(del,"Tap again to delete",async()=>{await guard(remove("equipment",x.id),"Deleted");s.remove()});
+  s.querySelector("#qf").onsubmit=async e=>{e.preventDefault();try{await save("equipment",x.id,{...clean(x),name:s.querySelector("#qn").value.trim(),hours:+s.querySelector("#qh").value||0,interval:+s.querySelector("#qi").value||50,notes:s.querySelector("#qnotes").value});s.remove();toast("Saved");go()}catch(err){toast("Couldn't save. Check your connection and try again.")}}}
+
+function payForm(j){
+  let method=j.paidMethod||"Cash";
+  const s=sheet(`<div class="row"><h2 class="grow">Record payment</h2><button class="small" data-close>Close</button></div>
+    <p class="name">${esc(j.clientName||"Walk-up job")} · ${money(jobTotal(j))}</p>
+    <div class="grid3">${PAY_METHODS.map(p=>`<button type="button" data-m="${p}" aria-pressed="${p===method}">${p}</button>`).join("")}</div>
+    <button class="go full" id="pgo" style="margin-top:14px">Mark paid</button>`);
+  s.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{method=b.dataset.m;s.querySelectorAll("[data-m]").forEach(o=>o.setAttribute("aria-pressed",o===b))});
+  s.querySelector("#pgo").onclick=async()=>{await guard(save("jobs",j.id,{...clean(j),status:"paid",paidMethod:method,paidOn:todayISO()}),"Paid by "+method);s.remove();go()}}
+
+async function markDone(j){
+  const data={...clean(j),status:"done",doneOn:todayISO()};
+  if(j.startedAt){data.minutes=mins(j);delete data.startedAt}
+  try{await save("jobs",j.id,data);
+    if(j.repeat&&j.repeat!=="none"){const step={weekly:7,biweekly:14,monthly:28}[j.repeat]||7;
+      const nx={...data,status:"scheduled",date:addDays(j.date,step),created:Date.now(),photos:[],minutes:0};delete nx.paidOn;delete nx.paidMethod;delete nx.doneOn;delete nx.order;
+      await save("jobs",newId(),nx);toast("Done. Next visit "+niceDate(nx.date))}else toast("Marked done")}
+  catch(e){toast("Couldn't save. Check your connection and try again.")}}
+
+const invoiceText=j=>{const st={phone:DEF.phone,...state.settings};return `${biz()} LLC${st.phone?"\n"+st.phone:""}\n${DEF.email}\nINVOICE · ${niceDate(j.date)}\nFor: ${j.clientName||"Lawn service"}${j.address?"\n"+j.address:""}\n\n${(j.items||[]).map(i=>`${i.k==="custom"?(i.label||"Service"):svc(i.k).label}${svc(i.k).type==="unit"?" × "+i.qty:""} .... ${money(i.price)}`).join("\n")}${j.disc?"\nDiscount .... -"+money(j.disc):""}${j.tax?"\nTax .... "+money(j.tax):""}\n\nTOTAL DUE: ${money(jobTotal(j))}${st.payInfo?"\nPay by: "+st.payInfo:""}\n\nThank you for choosing ${biz()}!`};
+function estimateText(){const c=state.clients.find(x=>x.id===Q.clientId),t=totals(Q.items,Q.disc,state.settings.tax),st={phone:DEF.phone,...state.settings};
+  return `${biz()} — ESTIMATE${c?"\nFor: "+c.name:""}${c?.address?"\n"+c.address:""}\nLawn: ${(+Q.sqft).toLocaleString()} sq ft\n\n${Q.items.map(i=>`${i.k==="custom"?(i.label||"Service"):svc(i.k).label}${svc(i.k).type==="unit"?" × "+i.qty:""} .... ${money(i.price)}`).join("\n")}${t.disc?"\nDiscount .... -"+money(t.disc):""}${t.tax?"\nTax .... "+money(t.tax):""}\n\nTOTAL: ${money(t.total)}\nReply YES to book.${st.phone?" Questions? "+st.phone:""}`}
+
+async function exportCSV(){
+  const rows=[["Type","Date","Client/Category","Status/Note","Method","Amount"]];
+  state.jobs.forEach(j=>rows.push(["Job",j.date,j.clientName||"Walk-up",j.status,j.paidMethod||"",jobTotal(j)]));
+  state.expenses.forEach(e=>rows.push(["Expense",e.date,e.cat,e.note||"","",-(+e.amount||0)]));
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
+  if(downloads){try{await downloads.save({filename:`pblc-books-${todayISO()}.csv`,data:csv});return}catch(e){if(e&&e.code==="declined")return}}
+  copy(csv)}
+
+/* ===== events ===== */
+document.getElementById("tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;state.tab=b.dataset.tab;if(b.dataset.tab==="more")state.more="menu";go();window.scrollTo(0,0)});
+const view=document.getElementById("view");
+view.addEventListener("click",async e=>{
+  const lot=e.target.closest("[data-lot]");if(lot){Q.sqft=+lot.dataset.lot;Q.items.forEach(i=>{if(svc(i.k).type==="area")i.price=linePrice(i,Q.sqft)});go();return}
+  const rm=e.target.closest("#qform [data-rm]");if(rm){Q.items.splice(+rm.dataset.rm,1);go();return}
+  const b=e.target.closest("[data-act]");if(!b)return;
+  const id=b.dataset.id,j=state.jobs.find(x=>x.id===id),c=state.clients.find(x=>x.id===id);
+  switch(b.dataset.act){
+    case "new":jobForm();break;
+    case "edit":jobForm(j);break;
+    case "done":markDone(j);break;
+    case "pay":payForm(j);break;
+    case "invoice":copy(invoiceText(j));break;
+    case "timer":guard(save("jobs",j.id,j.startedAt?{...clean(j),minutes:mins(j),startedAt:null}:{...clean(j),startedAt:Date.now()}),j.startedAt?"Timer stopped":"Timer running");break;
+    case "up":case "down":{const t=todayISO(),list=state.jobs.filter(x=>x.date===t&&x.status==="scheduled").sort((a,b)=>(a.order??a.created??0)-(b.order??b.created??0));
+      const i=list.findIndex(x=>x.id===id),k=b.dataset.act==="up"?i-1:i+1;if(k<0||k>=list.length)break;[list[i],list[k]]=[list[k],list[i]];
+      for(let n=0;n<list.length;n++)if(list[n].order!==n)await save("jobs",list[n].id,{...clean(list[n]),order:n}).catch(()=>{});break}
+    case "quote":state.tab="more";state.more="quote";go();break;
+    case "wk":state.day=addDays(state.day,+b.dataset.n);go();break;
+    case "day":state.day=b.dataset.d;go();break;
+    case "newclient":clientForm();break;
+    case "newlead":clientForm(null,true);break;
+    case "editclient":clientForm(c);break;
+    case "cf":state.cfilter=b.dataset.f;go();break;
+    case "copyphone":copy(c.phone);break;
+    case "textjob":textSheet(null,j);break;
+    case "textclient":textSheet(c,null);break;
+    case "history":historySheet(c);break;
+    case "newcrew":crewForm();break;
+    case "editcrew":crewForm(state.crew.find(x=>x.id===id));break;
+    case "crewroute":{const cr=state.crew.find(x=>x.id===id);const a=document.createElement("a");a.href=smsHref(cr.phone,crewRouteText(cr));a.click();break}
+    case "go-crew":state.tab="more";state.more="crew";go();window.scrollTo(0,0);break;
+    case "textall":{const t=todayISO(),js=state.jobs.filter(x=>x.date===t&&x.status==="scheduled");const T=texts();
+      sheet(`<div class="row"><h2 class="grow">Text today's clients</h2><button class="small" data-close>Close</button></div><p class="hint">Tap each one to open a ready message.</p><div class="list">${js.map(x=>{const cl=state.clients.find(q=>q.id===x.clientId);return cl&&cl.phone?`<a class="btn" href="${smsHref(cl.phone,fillText(T.rain[1],cl,x))}">${esc(cl.name)}</a>`:`<div class="sub">${esc(x.clientName||"Walk-up")}: no phone on file</div>`}).join("")}</div>`);break}
+    case "resettexts":guard(saveSettings({...state.settings,texts:{}}),"Defaults restored").then(go);break;
+    case "convert":guard(save("clients",c.id,{...clean(c),stage:"active"}),c.name+" is now a client");break;
+    case "quoteclient":Q={clientId:c.id,sqft:c.lot||7000,items:[],disc:0};state.tab="more";state.more="quote";go();break;
+    case "copyquote":copy(estimateText());break;
+    case "quotejob":{const t=totals(Q.items,Q.disc,state.settings.tax);jobForm({clientId:Q.clientId,items:JSON.parse(JSON.stringify(Q.items)),disc:t.disc});break}
+    case "newexp":expForm();break;
+    case "editexp":expForm(state.expenses.find(x=>x.id===id));break;
+    case "csv":exportCSV();break;
+    case "go":state.more=b.dataset.v;go();window.scrollTo(0,0);break;
+    case "go-site":state.tab="more";state.more="site";go();window.scrollTo(0,0);break;
+    case "clover":cloverOpen();break;
+    case "newequip":equipForm();break;
+    case "editequip":equipForm(state.equipment.find(x=>x.id===id));break;
+    case "hrs":{const x=state.equipment.find(q=>q.id===id);guard(save("equipment",id,{...clean(x),hours:(+x.hours||0)+(+b.dataset.n)}));break}
+    case "serviced":{const x=state.equipment.find(q=>q.id===id);guard(save("equipment",id,{...clean(x),lastService:+x.hours||0,lastServiceDate:todayISO()}),"Service logged");break}
+    case "preset":document.getElementById("aiq").value=b.dataset.p;document.getElementById("aiq").focus();break;
+    case "copyai":copy(state.aia);break;
+  }
+});
+view.addEventListener("input",e=>{
+  if(e.target.id==="cq"){state.cq=e.target.value;go();return}
+  if(e.target.id==="aiq"){state.aiq=e.target.value;return}
+  if(!e.target.closest("#qform"))return;
+  const t=e.target;
+  if(t.id==="qclient"){Q.clientId=t.value;const c=state.clients.find(x=>x.id===t.value);if(c&&c.lot){Q.sqft=c.lot;Q.items.forEach(i=>{if(svc(i.k).type==="area")i.price=linePrice(i,Q.sqft)});go()}return}
+  if(t.id==="qsqft"){Q.sqft=+t.value||0;Q.items.forEach((i,n)=>{if(svc(i.k).type==="area"){i.price=linePrice(i,Q.sqft);const el=document.querySelectorAll("#qform .qprice")[n];if(el)el.value=i.price}})}
+  if(t.id==="qdisc")Q.disc=+t.value||0;
+  const row=t.closest(".item");if(row){const it=Q.items[+row.dataset.n];
+    if(t.classList.contains("qqty")){it.qty=+t.value||0;it.price=linePrice(it,Q.sqft);row.querySelector(".qprice").value=it.price}
+    if(t.classList.contains("qprice"))it.price=+t.value||0;if(t.classList.contains("qlbl"))it.label=t.value}
+  const box=document.getElementById("qtotal");if(box)box.outerHTML=totalsBox(totals(Q.items,Q.disc,state.settings.tax),"qtotal");
+});
+view.addEventListener("change",e=>{if(e.target.id==="qadd"&&e.target.value){const it={k:e.target.value,qty:1};it.price=linePrice(it,Q.sqft);Q.items.push(it);go()}});
+view.addEventListener("submit",async e=>{
+  if(e.target.id==="aiform"){e.preventDefault();const q=document.getElementById("aiq").value.trim();if(q)askAI(q);return}
+  if(e.target.id==="tform"){e.preventDefault();const o={};e.target.querySelectorAll("[data-tk]").forEach(t=>{if(t.value.trim()!==DEFAULT_TEXTS[t.dataset.tk][1])o[t.dataset.tk]=t.value.trim()});await guard(saveSettings({...state.settings,texts:o}),"Templates saved");document.activeElement.blur();go();return}
+  if(e.target.id==="sform"){e.preventDefault();const f=e.target,rates={};
+    f.querySelectorAll("[data-rate]").forEach(i=>{rates[i.dataset.rate]={rate:+i.value||0}});f.querySelectorAll("[data-min]").forEach(i=>{rates[i.dataset.min].min=+i.value||0});
+    await guard(saveSettings({...state.settings,botName:f.querySelector("#sbot").value.trim()||"Mr. Ed",name:(local.write("pin",f.querySelector("#spin").value.trim()),local.write("aiCode",f.querySelector("#saic").value.trim()),f.querySelector("#sname").value.trim()),tagline:f.querySelector("#stag").value.trim(),phone:f.querySelector("#sphone").value.trim(),tax:+f.querySelector("#stax").value||0,payInfo:f.querySelector("#spay").value.trim(),crews:f.querySelector("#screws").value.split(",").map(x=>x.trim()).filter(Boolean),rates}),"Settings saved");
+    document.activeElement.blur();go()}
+});
+setInterval(()=>{if(state.jobs.some(j=>j.startedAt)&&!document.querySelector(".sheet")&&!document.activeElement?.closest?.("form"))go()},60000);
+(function(){const b=document.createElement("button");b.className="clover-fab";b.setAttribute("aria-label","Ask Mr. Ed, your PowerBlade helper");b.innerHTML=CLOVER_SVG(76,"live");b.onclick=()=>cloverOpen();document.body.appendChild(b)})();
+(function lock(){const pin=local.read("pin","");if(!pin)return;const o=document.createElement("div");o.className="sheet";o.style.alignItems="center";
+  o.innerHTML=`<div class="panel" style="border-radius:16px;max-width:420px;margin:auto"><div class="wrap"><h2>Owner Panel</h2><label for="pinin">Enter PIN<input id="pinin" type="password" inputmode="numeric" autocomplete="off"></label><p class="hint" id="pinmsg"></p></div></div>`;
+  document.body.appendChild(o);const i=o.querySelector("#pinin");i.focus();i.oninput=()=>{if(i.value===pin){o.remove();go()}else if(i.value.length>=pin.length)o.querySelector("#pinmsg").textContent="That PIN didn't match. Try again."}})();
+boot();
+</script>
