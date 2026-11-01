@@ -10,6 +10,7 @@
 /* If a photo can't load, hide it so the slot shows the brand-color panel behind it */
 addEventListener("error",function(e){var t=e.target;if(t&&t.tagName==="IMG")t.style.visibility="hidden"},true);
 </script>
+<script src="mascot.js"></script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -158,6 +159,20 @@ nav button{background:none;border:0;color:#cfd8e2;font:500 13px var(--f-b);min-h
 nav button svg{width:24px;height:24px}
 nav button[aria-current="page"]{color:var(--gold)}
 nav button[aria-current="page"] span{font-weight:700}
+
+.edp{position:fixed;inset:0;z-index:40;background:rgba(8,14,10,.55);display:flex;align-items:flex-end;justify-content:flex-end}
+.edp .box{background:var(--bg);width:100%;max-width:440px;max-height:88vh;display:flex;flex-direction:column;border-radius:20px 20px 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.35);padding:14px 14px calc(14px + env(safe-area-inset-bottom,0px))}
+@media (min-width:700px){.edp{align-items:flex-end;padding:0 20px 20px}.edp .box{border-radius:20px}}
+.edp .hd{display:flex;gap:10px;align-items:center}
+.edp .hd img{width:64px;height:64px;object-fit:cover;object-position:50% 8%;border-radius:50%;background:radial-gradient(circle at 50% 38%,#3a0d0d,#0d0d0d 72%);border:3px solid var(--gold)}
+.edp .hd b{font:800 22px var(--f-d)}.edp .hd small{display:block;color:var(--muted);font-size:14px}
+.edp .x{margin-left:auto;min-height:44px;padding:0 14px;font-size:16px}
+.edp .log{flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:12px 2px}
+.edp .m{padding:11px 13px;border-radius:16px;max-width:88%;white-space:pre-wrap;font-size:17px;line-height:1.45}
+.edp .m.bot{background:var(--surface);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
+.edp .m.me{background:var(--green);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.edp .sugg{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}.edp .sugg button{white-space:nowrap;min-height:42px;font-size:15px;padding:0 12px}
+.edp form{display:grid;grid-template-columns:1fr auto;gap:8px}.edp form .btn{min-height:54px}
 section[hidden]{display:none}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(150px + env(safe-area-inset-bottom,0px));background:var(--navy);color:#fff;padding:12px 18px;border-radius:12px;font-weight:700;z-index:40;max-width:calc(100% - 32px)}
 .install{display:flex;gap:12px;align-items:center;padding:14px 16px}
@@ -476,6 +491,47 @@ applyContent(draft);
 fetch("content.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(pub=>{if(pub&&!draft)applyContent(pub)}).catch(()=>{});
 addEventListener("storage",e=>{if(e.key==="pb_content"){try{draft=JSON.parse(e.newValue||"null")}catch(_){}applyContent(draft)}});
 if(draft){const n=document.createElement("div");n.className="note";n.style.cssText="position:fixed;top:calc(64px + env(safe-area-inset-top,0px));left:12px;right:12px;z-index:30";n.innerHTML='<b>Owner preview:</b> showing your unpublished edits on this phone.';document.body.appendChild(n);setTimeout(()=>n.remove(),5000)}
+
+/* ---- Mr. Ed for customers: public info only (services, areas, hours, quotes, lawn tips) ---- */
+const ED_LAWN=[
+ [/aerat|overseed|seed/,"In Middle Tennessee most lawns are tall fescue. Core aerate and overseed in early fall, about early September to mid October, when nights cool down. Bermuda and zoysia lawns are aerated in early summer (June–July) while they're actively growing, and aren't overseeded with fescue."],
+ [/(how (high|tall|short)|mow(ing)? height|cut height)/,"Tall fescue: mow at 3½–4 inches. Bermuda: 1–2 inches. Zoysia: 1½–2½ inches. Never cut off more than one-third of the grass blade at one time, and keep blades sharp."],
+ [/fertiliz|feed/,"Tall fescue is fed mainly in the fall (September and November are the key months), with little or none in summer. Bermuda and zoysia are fed in late spring through summer, about May to August. A soil test through UT Extension tells you exactly what's needed."],
+ [/crabgrass|pre.?emergent/,"Put down crabgrass pre-emergent in late winter to early spring, before soil reaches about 55°F (around when forsythia blooms, typically early-to-mid March in Middle Tennessee). Don't use it on areas you plan to seed."],
+ [/water/,"Lawns need about 1 inch of water a week, counting rain. Water early in the morning, deeply and less often, so roots grow deep and disease stays down."],
+ [/mulch/,"Spread mulch 2–3 inches deep and keep it a few inches away from tree trunks and plant stems. Avoid \"mulch volcanoes\" piled against trunks; they invite rot and pests."],
+ [/hedge|shrub|prun/,"Spring-flowering shrubs (like azaleas and forsythia) are pruned right after they bloom. Most hedges are trimmed in late spring and early summer. Avoid heavy pruning from late August on, so new growth can harden before frost."],
+ [/leaf|leaves/,"Light leaf cover can be mulch-mowed back into the lawn. Heavy cover should be removed so it doesn't smother the grass, especially on newly seeded fescue."],
+ [/sod/,"Sod is best laid when the grass type is actively growing: fescue in fall or spring, bermuda and zoysia in late spring to summer. Water daily for the first two weeks, then taper off as it roots."],
+ [/grub|brown patch|disease|fungus/,"Brown patch is common on tall fescue in hot, humid summers; avoid summer fertilizing and evening watering. Grub damage shows as turf that peels up like carpet; treatment timing matters, so check UT Extension guidance or a local turf professional before applying products."],
+];
+function edAnswer(q){q=q.toLowerCase();
+  if(/quote|estimate|price|cost|how much/.test(q))return {t:"Quotes are free and there's no obligation. Tap \"Get my free quote\" and pick what you need. PowerBlade replies within 24 hours.",a:"quote"};
+  if(/servic|what do you|offer|do you do/.test(q))return {t:"PowerBlade offers:\n"+SERVICES.map(s=>"• "+s[0]).join("\n")+"\n\nTap Services to see photos of each."};
+  if(/area|serve|city|cities|where|location|come to/.test(q)){const hit=AREAS.find(a=>q.includes(a.toLowerCase()));return {t:hit?`Yes, PowerBlade serves ${hit}!`:"PowerBlade serves "+AREAS.join(", ")+", plus Sumner and Davidson Counties."}}
+  if(/open|hour|close|today|time/.test(q)){const st=openStatus();return {t:`${st.text}${st.sub?" · "+st.sub:""}.\nHours: Mon–Thu 9–5, Fri 9–1 (Central). Closed weekends.`}}
+  if(/call|phone|number|talk|text|contact|email/.test(q))return {t:`Call or text ${($('a[href^="tel:"] small')||{}).textContent||"(615) 587-2226"}, or email ${EMAIL}.`,a:"call"};
+  if(/guarantee|not happy|satisf|redo|fix/.test(q))return {t:"If you're not satisfied, PowerBlade comes back and fixes it for free."};
+  if(/insur|commercial|hoa|business|office/.test(q))return {t:"Yes. PowerBlade cares for commercial properties and HOAs with insured, uniformed crews and simple billing. Tap \"Get my free quote\" and choose Commercial / HOA.",a:"quote"};
+  const tip=(ED_LAWN.find(([r])=>r.test(q))||[])[1];if(tip)return {t:tip+"\n\nWant PowerBlade to handle it? Get a free quote anytime.",a:"quote"};
+  return {t:"Good question! The PowerBlade team can answer that one. Tap Call, or send a free quote request and they'll reply within 24 hours.",a:"call"}}
+function edOpen(){if($(".edp"))return;const p=document.createElement("div");p.className="edp";p.setAttribute("role","dialog");p.setAttribute("aria-label","Chat with Mr. Ed");
+  p.innerHTML=`<div class="box"><div class="hd"><img src="ninja.webp" alt=""><div><b>Mr. Ed</b><small>PowerBlade's lawn ninja</small></div><button class="btn x" type="button">Close</button></div>
+  <div class="log"><div class="m bot">Hi, I'm Mr. Ed! Ask me about PowerBlade's services, areas, hours, or your lawn.</div></div>
+  <div class="sugg">${["Get a free quote","What services do you offer?","Do you serve my area?","Are you open now?","When should I aerate?","Call PowerBlade"].map(x=>`<button class="btn" type="button">${x}</button>`).join("")}</div>
+  <form><label for="edIn" style="position:absolute;width:1px;height:1px;overflow:hidden">Ask Mr. Ed</label><input id="edIn" placeholder="Ask a question…" autocomplete="off"><button class="btn green" type="submit">Ask</button></form></div>`;
+  document.body.appendChild(p);const log=p.querySelector(".log"),inp=p.querySelector("#edIn");
+  const add=(t,w)=>{const d=document.createElement("div");d.className="m "+w;d.textContent=t;log.appendChild(d);log.scrollTop=log.scrollHeight;return d};
+  const act=a=>{const b=document.createElement("div");b.style.cssText="display:flex;gap:8px;flex-wrap:wrap";
+    b.innerHTML=a==="call"?`<a class="btn" href="${$('a[href^="tel:"]').href}">📞 Call</a><button class="btn gold" type="button" data-q>Free quote</button>`:`<button class="btn gold" type="button" data-q>Get my free quote</button>`;
+    b.querySelector("[data-q]").onclick=()=>{p.remove();go("quote")};log.appendChild(b);log.scrollTop=log.scrollHeight};
+  const ask=q=>{q=q.trim();if(!q)return;if(/^call powerblade$/i.test(q)){location.href=$('a[href^="tel:"]').href;return}if(/^get a free quote$/i.test(q)){p.remove();go("quote");return}
+    add(q,"me");inp.value="";const r=edAnswer(q);setTimeout(()=>{add(r.t,"bot");if(r.a)act(r.a)},250)};
+  p.querySelector("form").onsubmit=e=>{e.preventDefault();ask(inp.value)};
+  p.querySelectorAll(".sugg button").forEach(b=>b.onclick=()=>ask(b.textContent));
+  p.querySelector(".x").onclick=()=>p.remove();p.addEventListener("click",e=>{if(e.target===p)p.remove()});
+  document.addEventListener("keydown",function k(e){if(e.key==="Escape"){p.remove();document.removeEventListener("keydown",k)}});setTimeout(()=>inp.focus(),50)}
+if(window.PBMascot)PBMascot.mount({img:"ninja.webp",label:"Ask Mr. Ed",onOpen:edOpen,bottom:matchMedia("(min-width:900px)").matches?"24px":"calc(146px + env(safe-area-inset-bottom,0px))"});
 setInterval(renderOpen,60000);
 if(window.matchMedia("(display-mode: standalone)").matches)$("#installCard").hidden=true;
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});

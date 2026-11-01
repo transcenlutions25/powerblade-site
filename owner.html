@@ -1,5 +1,6 @@
 <title>PowerBlade Owner Panel</title>
 <meta name="robots" content="noindex">
+<script src="mascot.js"></script>
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png">
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="theme-color" content="#31572C">
@@ -400,7 +401,7 @@ function vQuote(){
 
 /* ===== Mr. Ed — owner assistant ===== */
 const HELPER_IMG=()=>{try{return localStorage.getItem("pb_helperImg")||""}catch(e){return ""}};
-const CLOVER_SVG=(size,cls="")=>HELPER_IMG()?`<img class="helper ${cls}" src="${HELPER_IMG()}" alt="" width="${size}" height="${size}">`:`<span class="helper mono ${cls}" style="width:${size}px;height:${size}px;font-size:${Math.round(size*.34)}px" aria-hidden="true">Ed</span>`;
+const CLOVER_SVG=(size,cls="")=>`<img class="helper ${cls}" src="${HELPER_IMG()||"ninja.webp"}" alt="" width="${size}" height="${size}" style="object-position:50% 8%;background:radial-gradient(circle at 50% 38%,#3a0d0d,#0d0d0d 72%)">`;
 const BOT_NAME=()=>state.settings.botName||"Mr. Ed";
 
 /* answers it can give from the owner's own records, exactly */
@@ -992,7 +993,7 @@ view.addEventListener("submit",async e=>{
     document.activeElement.blur();go()}
 });
 setInterval(()=>{if(state.jobs.some(j=>j.startedAt)&&!document.querySelector(".sheet")&&!document.activeElement?.closest?.("form"))go()},60000);
-(function(){const b=document.createElement("button");b.className="clover-fab";b.setAttribute("aria-label","Ask Mr. Ed, your PowerBlade helper");b.innerHTML=CLOVER_SVG(76,"live");b.onclick=()=>cloverOpen();document.body.appendChild(b)})();
+if(window.PBMascot)PBMascot.mount({img:HELPER_IMG()||"ninja.webp",label:"Ask Mr. Ed",onOpen:()=>cloverOpen(),bottom:"calc(84px + env(safe-area-inset-bottom,0px))"});
 (function lock(){const pin=local.read("pin","");if(!pin)return;const o=document.createElement("div");o.className="sheet";o.style.alignItems="center";
   o.innerHTML=`<div class="panel" style="border-radius:16px;max-width:420px;margin:auto"><div class="wrap"><h2>Owner Panel</h2><label for="pinin">Enter PIN<input id="pinin" type="password" inputmode="numeric" autocomplete="off"></label><p class="hint" id="pinmsg"></p></div></div>`;
   document.body.appendChild(o);const i=o.querySelector("#pinin");i.focus();i.oninput=()=>{if(i.value===pin){o.remove();go()}else if(i.value.length>=pin.length)o.querySelector("#pinmsg").textContent="That PIN didn't match. Try again."}})();
