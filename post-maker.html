@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Post Maker | PowerBlade Owner Panel</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@600;700;800&family=Roboto:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#f4f4f4;--surface:#ffffff;--fg:#192a3d;--muted:#444f5c;--line:#c9d0d7;--field:#ffffff;--accent:#31572c;--btn:#fcb816;--btn-ink:#192a3d;--bar:#31572c;--bar-ink:#ffffff;--warn:#9a5600;--display:"Jost","Trebuchet MS",Arial,sans-serif;--body:"Roboto",system-ui,Arial,sans-serif;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1a26;--surface:#192a3d;--fg:#f1f4f7;--muted:#b8c3cf;--line:#2c4058;--field:#0f1a26;--accent:#8fd184;--btn:#fcb816;--btn-ink:#192a3d;--bar:#31572c;--bar-ink:#ffffff;--warn:#ffbe5c;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--fg);font:400 18px/1.45 var(--body)}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;padding:6px max(16px,env(safe-area-inset-left,0px));background:var(--bar);color:var(--bar-ink)}
+header a{color:inherit;font-weight:700;text-decoration:none;min-height:48px;display:inline-flex;align-items:center}
+header b{font:800 20px/1 var(--display);text-transform:uppercase;letter-spacing:.04em}
+main{max-width:1040px;margin:0 auto;padding:16px max(16px,env(safe-area-inset-left,0px)) 64px}
+.note{margin:0 0 14px;font-size:16px;color:var(--muted)}
+.note b{color:var(--fg)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.card{padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+label{display:grid;gap:6px;margin:0 0 12px;flex:1 1 0;min-width:0}
+label>span{font-size:15px;font-weight:700;color:var(--muted)}
+input,select{width:100%;min-height:52px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--field);font-size:18px}
+.row{display:flex;gap:12px}.short{flex:0 0 96px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:12px 18px;border-radius:12px;border:1px solid var(--line);background:transparent;font-weight:700;cursor:pointer;text-decoration:none}
+.primary{background:var(--btn);color:var(--btn-ink);border-color:var(--btn)}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.actions .btn{flex:1 1 160px}
+#preview{display:block;width:100%;height:auto;border-radius:12px;background:#000}
+ul{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:6px;font-size:16px}
+li.fix{color:var(--warn);font-weight:700}li.tip{color:var(--muted)}.ok{color:var(--accent);font-weight:700}
+details{margin-top:16px}summary{min-height:48px;display:flex;align-items:center;font-weight:700;cursor:pointer}
+ol{padding-left:22px;display:grid;gap:8px;margin:4px 0 0}ol span{display:block;color:var(--muted);font-size:16px}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);padding:12px 18px;border-radius:999px;background:var(--surface);border:2px solid var(--accent);font-weight:700;display:none;z-index:20}
+#big{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px;color:#fff;text-align:center}
+#big[hidden]{display:none}#big img{max-width:100%;max-height:72vh;border-radius:8px}#big .btn{border-color:#fff;min-width:160px}
+@media(max-width:820px){.grid{grid-template-columns:1fr}.preview{order:-1}}
+@media(max-width:420px){.row{flex-wrap:wrap}.short{flex:1 1 100%}}
+</style>
+</head>
+<body>
+<header><a href="owner.html">&larr; Owner Panel</a><b>Post maker</b></header>
+<main>
+<p class="note"><b>Works now:</b> make the picture, download it, copy the caption. <b>Not connected:</b> posting to Facebook or Instagram.</p>
+<div class="grid">
+<section class="card">
+<label><span>Business name</span><input id="business" autocomplete="organization"></label>
+<div class="row"><label><span>City</span><input id="city" autocomplete="address-level2"></label><label class="short"><span>State</span><input id="region" maxlength="3" autocomplete="address-level1"></label></div>
+<label><span>Kind of business</span><select id="niche"></select></label>
+<label><span>Small line</span><input id="setup"></label>
+<label><span>Big line</span><input id="payoff"></label>
+<button class="btn" id="next" type="button">Next headline</button>
+<label style="margin-top:12px"><span>What you do</span><input id="serviceLine" list="svc"><datalist id="svc"></datalist></label>
+<label><span>Button</span><input id="cta" list="ctas"><datalist id="ctas"></datalist></label>
+<div class="row"><label><span>Size</span><select id="format"></select></label><label><span>Colors</span><select id="palette"></select></label></div>
+<div class="actions"><label class="btn" style="margin:0">Add your photo<input id="photo" type="file" accept="image/png,image/jpeg,image/webp" hidden></label><button class="btn" id="nophoto" type="button" hidden>Remove photo</button></div>
+<p id="tip" class="note" style="margin-top:12px"></p>
+</section>
+<section class="card preview">
+<img id="preview" alt="Post preview">
+<div class="actions"><button class="btn primary" id="dl" type="button">Save picture</button><button class="btn" id="cap" type="button">Copy caption</button></div>
+<ul id="checks"></ul>
+</section>
+</div>
+<details class="card"><summary>Why this post works</summary><ol id="formula"></ol></details>
+</main>
+<div id="big" hidden role="dialog" aria-modal="true" aria-label="Your picture"><img id="bigimg" alt="Your finished post"><p>Take a screenshot to save it to your photos.</p><button class="btn" id="bigdone" type="button">Done</button></div>
+<div id="toast" role="status"></div>
+<script>
+/* Generated from Tay (transcenlutions repo) lib/free-post.ts. Runs on this phone only; nothing is posted or sent. */
+/**
+ * Free Post maker: the local-service social post formula, reverse-engineered from a cold-outreach
+ * ad the Owner received on Nov 6, 2026 ("A free social post I made for Hallway Cleaning").
+ * Only the pattern is reused here. All copy, layout code and presets are original; the sender's
+ * brand, wording and photo are not copied.
+ *
+ * Runs on the device. Nothing here posts to social accounts or sends email.
+ */
+var presetSpec = presetSpec;
+var checkPost = checkPost;
+var escapeXml = escapeXml;
+var renderPostSVG = renderPostSVG;
+var caption = caption;
+var outreachEmail = outreachEmail;
+var mailtoLink = mailtoLink;
+var fileName = fileName;
+var emptyFreePost = emptyFreePost;
+var parseFreePost = parseFreePost;
+/** The seven parts that make the post work. Shown in the app so the method is learnable. */
+var POST_FORMULA = [
+    { id: "local-tag", name: "Local tag", what: "The city and state in small capitals at the top.", why: "People stop for their own town. It also says the post was made for them, not mass-produced." },
+    { id: "two-beat", name: "Two-beat headline", what: "A short, plain first beat, then an italic gold second beat.", why: "The first beat names the small thing you do. The second names the big feeling the customer gets." },
+    { id: "service-line", name: "Plain service line", what: "One line saying exactly what you do and for whom.", why: "The headline sells a feeling, so this line removes any doubt about the actual service." },
+    { id: "pin", name: "Location pin", what: "A gold rule, a map pin and the city again.", why: "It repeats the local signal in the place eyes land after the headline." },
+    { id: "after-photo", name: "Finished-result photo", what: "A warm, real photo of the finished result, with the text on the clearer side.", why: "Customers buy the after, not the work. Your own real photos build more trust than stock." },
+    { id: "one-cta", name: "One low-commitment button", what: "A single gold pill such as \"Get a cleaning quote\".", why: "Asking for an estimate is easy to say yes to. One button, no menu of choices." },
+    { id: "free-post-play", name: "The free-post outreach play", what: "Make the post for a business you want as a client, then email it to them free.", why: "The image shows in their email preview, it already has their name on it, and a free gift earns a reply." },
+];
+var NICHES = {
+    cleaning: {
+        label: "Home cleaning",
+        headlines: [["Clean counters.", "Clear mind."], ["Less mess.", "More weekend."], ["One visit.", "Whole-home calm."], ["Spotless kitchen.", "Sunday restored."], ["Fresh rooms.", "Fresh start."]],
+        serviceLines: ["Light cleaning for homes & apartments", "Weekly and one-time home cleaning", "Kitchen, bath and whole-home cleaning"],
+        ctas: ["Get a cleaning quote", "Book a walkthrough", "Request an estimate"],
+        photoTip: "A sunlit kitchen or bathroom you finished, shot from the doorway, counters clear.",
+    },
+    "apartment-turns": {
+        label: "Apartment turns",
+        headlines: [["Move-out mess.", "Move-in ready."], ["Keys back.", "Unit ready."], ["Tight turnover.", "Clean handoff."], ["Vacant today.", "Show-ready soon."], ["Your turn list.", "Handled."]],
+        serviceLines: ["Apartment cleaning & turns for property managers", "Make-ready cleaning for vacant units", "Turnover cleaning for apartment communities"],
+        ctas: ["Request a turn quote", "Send me your next unit", "Book a walkthrough"],
+        photoTip: "An empty, bright unit after your turn: clean floors, open blinds, no supplies in frame.",
+    },
+    lawn: {
+        label: "Lawn care",
+        headlines: [["Sharp edges.", "Proud curb."], ["Fresh cut.", "Free weekend."], ["Every visit.", "Clean lines."], ["Less mowing.", "More living."], ["Your yard.", "Handled."]],
+        serviceLines: ["Mowing, edging & curb appeal", "Lawn care for homes and businesses", "Weekly lawn care and seasonal cleanups"],
+        ctas: ["Get a lawn quote", "Request an estimate", "Book a yard visit"],
+        photoTip: "A freshly striped lawn and crisp edge in late-afternoon light, house in the background.",
+    },
+    "dryer-vent": {
+        label: "Dryer vent cleaning",
+        headlines: [["Clean vent.", "Peace of mind."], ["Lint out.", "Air flowing."], ["Quick visit.", "Easier laundry day."], ["Clear line.", "Calm home."]],
+        serviceLines: ["Dryer vent cleaning for homes & apartments", "Dryer vent cleaning and inspection", "Vent cleaning for homes and rental properties"],
+        ctas: ["Book a vent cleaning", "Request an estimate", "Get a vent quote"],
+        photoTip: "A clean laundry room with the dryer pulled out and a clear vent line, or a clean exterior vent cap.",
+    },
+    "home-services": {
+        label: "Home services",
+        headlines: [["One call.", "Job handled."], ["Small fix.", "Big relief."], ["Booked today.", "Done right."], ["Your list.", "Checked off."]],
+        serviceLines: ["Local pros for home & apartment jobs", "Repairs, cleaning and make-ready work", "Home services from local pros"],
+        ctas: ["Request a quote", "Tell us the job", "Book a visit"],
+        photoTip: "A finished job in good light: the fixed fixture, the clean room, the done list.",
+    },
+    general: {
+        label: "Any local business",
+        headlines: [["Show up.", "Stand out."], ["Local hands.", "Real results."], ["Small step.", "Big difference."], ["Right here.", "Ready now."]],
+        serviceLines: ["Serving our neighbors with care", "Local service you can reach", "Proudly local"],
+        ctas: ["Request a quote", "Book a visit", "Message us"],
+        photoTip: "Your best real result, warm and bright, with open space on one side for the words.",
+    },
+};
+/** Presets hold only facts the founder has stated. Unknown cities stay blank for the owner to fill. */
+var PRESETS = [
+    { id: "hallway-cleaning", business: "Hallway Cleaning", city: "Columbia", region: "SC", niche: "apartment-turns", serviceLine: "Apartment cleaning & turns for property managers" },
+    { id: "powerblade", business: "PowerBlade Lawn Care", city: "", region: "", niche: "lawn", serviceLine: "Mowing, edging & curb appeal" },
+    { id: "dryer-vent-tech", business: "Dryer Vent Tech of Nashville", city: "Nashville", region: "TN", niche: "dryer-vent", serviceLine: "Dryer vent cleaning for homes & apartments" },
+    { id: "seamless", business: "Seamless Solutions", city: "", region: "", niche: "home-services", serviceLine: "Local pros for home & apartment jobs" },
+    { id: "custom", business: "", city: "", region: "", niche: "general", serviceLine: "" },
+];
+var FORMATS = {
+    square: { label: "Square 1080×1080 (feed)", width: 1080, height: 1080 },
+    portrait: { label: "Portrait 1080×1350 (feed)", width: 1080, height: 1350 },
+    story: { label: "Story 1080×1920", width: 1080, height: 1920 },
+};
+var PALETTES = {
+    "cream-gold": { label: "Cream & gold", frame: "#0d0b09", panel: "#f7f0e3", ink: "#1b1712", soft: "#4a4036", gold: ["#c9a24e", "#8a6421"], ctaInk: "#1b1206", sky: ["#f3e3c4", "#c99e62"] },
+    "navy-gold": { label: "Navy & gold", frame: "#070b18", panel: "#eef1f7", ink: "#0f1830", soft: "#34405e", gold: ["#d6b25e", "#9a7426"], ctaInk: "#14100a", sky: ["#dfe6f3", "#7f93ba"] },
+    "forest-cream": { label: "Forest & cream", frame: "#08120c", panel: "#f3f1e6", ink: "#13241a", soft: "#3a4d40", gold: ["#c2a35a", "#7d6a2c"], ctaInk: "#15130a", sky: ["#e9ecd8", "#89a37a"] },
+    "charcoal-copper": { label: "Charcoal & copper", frame: "#0c0c0d", panel: "#f4efea", ink: "#1c1a19", soft: "#4b4541", gold: ["#c98b5a", "#8a5530"], ctaInk: "#1a0f08", sky: ["#efe2d6", "#b08a6c"] },
+};
+var LIMITS = { beatWords: 4, beatChars: 22, serviceChars: 52, ctaChars: 30 };
+const words = (s) => s.trim().split(/\s+/).filter(Boolean).length;
+function presetSpec(presetId, index = 0) {
+    var _a;
+    const p = (_a = PRESETS.find(x => x.id === presetId)) !== null && _a !== void 0 ? _a : PRESETS[PRESETS.length - 1];
+    const kit = NICHES[p.niche];
+    const [setup, payoff] = kit.headlines[index % kit.headlines.length];
+    return {
+        business: p.business, city: p.city, region: p.region, niche: p.niche, setup, payoff,
+        serviceLine: p.serviceLine || kit.serviceLines[0], cta: kit.ctas[0], format: "square", palette: "cream-gold",
+    };
+}
+/** Plain-language checks shown next to the preview. Nothing here blocks a download. */
+function checkPost(spec) {
+    const out = [];
+    if (!spec.business.trim())
+        out.push({ level: "fix", text: "Add the business name. The post should carry their name." });
+    if (!spec.city.trim())
+        out.push({ level: "fix", text: "Add a city. The local tag is what makes people stop." });
+    for (const [label, beat] of [["First beat", spec.setup], ["Second beat", spec.payoff]]) {
+        if (!beat.trim())
+            out.push({ level: "fix", text: `${label} is empty.` });
+        else if (words(beat) > LIMITS.beatWords || beat.trim().length > LIMITS.beatChars)
+            out.push({ level: "fix", text: `${label} is long. Keep it to ${LIMITS.beatWords} words or fewer.` });
+    }
+    if (spec.serviceLine.trim().length > LIMITS.serviceChars)
+        out.push({ level: "fix", text: "Service line is long. Say what you do and for whom in one short line." });
+    if (!spec.cta.trim())
+        out.push({ level: "fix", text: "Add one button, like \"Get a quote\"." });
+    else if (spec.cta.trim().length > LIMITS.ctaChars)
+        out.push({ level: "fix", text: "Button text is long. Three or four words is best." });
+    const all = [spec.setup, spec.payoff, spec.serviceLine, spec.cta].join(" ");
+    if (/\b(guarantee[sd]?|#1|number one|best in|cheapest|lowest price|cures?|risk[- ]free)\b/i.test(all))
+        out.push({ level: "fix", text: "Remove promises like \"guaranteed\", \"#1\" or \"cheapest\" unless you can prove them." });
+    if (/\bfree\b/i.test(all))
+        out.push({ level: "tip", text: "\"Free\" must really be free, with no catch." });
+    if (!spec.photo)
+        out.push({ level: "tip", text: `Add your own photo for best results. ${NICHES[spec.niche].photoTip}` });
+    return out;
+}
+function escapeXml(s) {
+    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+}
+/** Rough Georgia width in em per character, used to fit headline text to the panel. */
+const EM = 0.54;
+const fit = (text, maxWidth, max, min) => Math.round(Math.max(min, Math.min(max, maxWidth / Math.max(1, text.length * EM))));
+function safePhoto(photo) {
+    return photo && /^data:image\/(png|jpeg|jpg|webp);base64,[A-Za-z0-9+/=]+$/.test(photo) ? photo : "";
+}
+/** No-photo fallback: a soft, sunlit room (window with panes, counter line) drawn in shapes. */
+function roomBackdrop(x, y, w, h, ink) {
+    const wx = x + w * 0.62, wy = y + h * 0.1, ww = w * 0.3, wh = h * 0.42;
+    const counter = y + h * 0.7;
+    return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#sky)"/>
+  <rect x="${wx}" y="${wy}" width="${ww}" height="${wh}" rx="8" fill="#fffaf0" opacity=".78"/>
+  <g stroke="${ink}" stroke-opacity=".16" stroke-width="10" fill="none"><rect x="${wx}" y="${wy}" width="${ww}" height="${wh}" rx="8"/><path d="M${wx + ww / 2} ${wy}V${wy + wh}M${wx} ${wy + wh / 2}H${wx + ww}"/></g>
+  <g stroke="${ink}" stroke-opacity=".07" stroke-width="3">${Array.from({ length: 7 }, (_, i) => `<path d="M${wx + 8} ${wy + 18 + i * (wh / 7)}H${wx + ww - 8}"/>`).join("")}</g>
+  <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#sun)"/>
+  <rect x="${x}" y="${counter}" width="${w}" height="${h - (counter - y)}" fill="${ink}" opacity=".12"/>
+  <rect x="${x}" y="${counter}" width="${w}" height="6" fill="#fffaf0" opacity=".55"/>`;
+}
+/** Renders the post as standalone SVG. Fonts fall back to the device serif. */
+function renderPostSVG(spec) {
+    const { width: W, height: H } = FORMATS[spec.format];
+    const c = PALETTES[spec.palette];
+    const pad = 28;
+    const band = 64;
+    const innerX = pad, innerY = pad + band, innerW = W - pad * 2, innerH = H - pad * 2 - band;
+    const tall = spec.format === "story";
+    const panelW = Math.round(innerW * (tall ? 0.92 : 0.58));
+    const textX = innerX + 56;
+    const textW = panelW - 96;
+    const tag = [spec.city.trim(), spec.region.trim()].filter(Boolean).join(", ").toUpperCase();
+    const place = [spec.city.trim(), spec.region.trim()].filter(Boolean).join(", ");
+    const s1 = fit(spec.setup, textW, 104, 54);
+    const s2 = fit(spec.payoff, textW, 112, 56);
+    const sv = Math.round(Math.max(20, Math.min(30, textW / Math.max(1, spec.serviceLine.trim().length * 0.46))));
+    const ctaH = 92;
+    const ctaY = H - pad - ctaH - 40;
+    // Text block height (business line to pin), centred in the space above the button.
+    const blockH = 34 + s1 + Math.round(s2 * 1.05) + 66 + 34 + 54;
+    const top = tall ? innerY + 150 : Math.round(innerY + Math.max(70, (ctaY - innerY - blockH) * 0.42));
+    const yBiz = top;
+    const y1 = yBiz + 34 + s1;
+    const y2 = y1 + Math.round(s2 * 1.05);
+    const yService = y2 + 66;
+    const yRule = yService + 34;
+    const yPin = yRule + 54;
+    const ctaW = Math.min(innerW - 120, Math.max(380, spec.cta.length * 24 + 120));
+    const ctaX = Math.round((W - ctaW) / 2);
+    const photo = safePhoto(spec.photo);
+    const e = escapeXml;
+    const tagW = Math.max(180, (tag || "YOUR CITY").length * 22 + 24);
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+<defs>
+  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c.gold[0]}"/><stop offset="1" stop-color="${c.gold[1]}"/></linearGradient>
+  <linearGradient id="pill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3dc9a"/><stop offset=".55" stop-color="${c.gold[0]}"/><stop offset="1" stop-color="${c.gold[1]}"/></linearGradient>
+  <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c.sky[0]}"/><stop offset="1" stop-color="${c.sky[1]}"/></linearGradient>
+  ${tall
+        ? `<linearGradient id="veil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c.panel}" stop-opacity=".97"/><stop offset=".42" stop-color="${c.panel}" stop-opacity=".9"/><stop offset=".6" stop-color="${c.panel}" stop-opacity="0"/></linearGradient>`
+        : `<linearGradient id="veil" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${c.panel}" stop-opacity=".97"/><stop offset="${(panelW / innerW * 0.78).toFixed(2)}" stop-color="${c.panel}" stop-opacity=".9"/><stop offset="${Math.min(1, panelW / innerW * 1.12).toFixed(2)}" stop-color="${c.panel}" stop-opacity="0"/></linearGradient>`}
+  <radialGradient id="sun" cx=".82" cy=".22" r=".7"><stop offset="0" stop-color="#fff6dc" stop-opacity=".95"/><stop offset="1" stop-color="#fff6dc" stop-opacity="0"/></radialGradient>
+  <clipPath id="inner"><rect x="${innerX}" y="${innerY}" width="${innerW}" height="${innerH}" rx="34"/></clipPath>
+</defs>
+<rect width="${W}" height="${H}" rx="44" fill="${c.frame}"/>
+<g fill="url(#gold)">
+  <rect x="${W / 2 - tagW / 2 - 150}" y="${pad + band / 2 - 1}" width="120" height="2"/>
+  <rect x="${W / 2 + tagW / 2 + 30}" y="${pad + band / 2 - 1}" width="120" height="2"/>
+</g>
+<text x="${W / 2}" y="${pad + band / 2 + 8}" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="24" font-weight="700" letter-spacing="6" fill="#efe3c4">${e(tag || "YOUR CITY")}</text>
+<g clip-path="url(#inner)">
+  ${photo
+        ? `<image href="${photo}" x="${innerX}" y="${innerY}" width="${innerW}" height="${innerH}" preserveAspectRatio="xMidYMid slice"/>`
+        : roomBackdrop(innerX, innerY, innerW, innerH, c.ink)}
+  <rect x="${innerX}" y="${innerY}" width="${innerW}" height="${innerH}" fill="url(#veil)"/>
+</g>
+<text x="${textX}" y="${yBiz}" font-family="Helvetica, Arial, sans-serif" font-size="22" font-weight="700" letter-spacing="4" fill="${c.gold[1]}">${e(spec.business.trim().toUpperCase())}</text>
+<text x="${textX}" y="${y1}" font-family="Georgia, 'Times New Roman', serif" font-size="${s1}" font-weight="700" fill="${c.ink}" letter-spacing="-1">${e(spec.setup.trim())}</text>
+<text x="${textX}" y="${y2}" font-family="Georgia, 'Times New Roman', serif" font-size="${s2}" font-style="italic" font-weight="700" fill="url(#gold)" letter-spacing="-1">${e(spec.payoff.trim())}</text>
+<text x="${textX}" y="${yService}" font-family="Georgia, 'Times New Roman', serif" font-size="${sv}" font-style="italic" fill="${c.soft}">${e(spec.serviceLine.trim())}</text>
+<rect x="${textX}" y="${yRule}" width="${Math.min(textW, 300)}" height="3" fill="url(#gold)"/>
+<g transform="translate(${textX} ${yPin - 30})"><path d="M14 0C6.3 0 0 6.1 0 13.7 0 24 14 38 14 38s14-14 14-24.3C28 6.1 21.7 0 14 0zm0 19a5.3 5.3 0 1 1 0-10.6A5.3 5.3 0 0 1 14 19z" fill="url(#gold)"/></g>
+<text x="${textX + 42}" y="${yPin}" font-family="Georgia, 'Times New Roman', serif" font-size="32" fill="${c.ink}">${e(place || "Your city")}</text>
+<rect x="${ctaX}" y="${ctaY}" width="${ctaW}" height="${ctaH}" rx="${ctaH / 2}" fill="url(#pill)" stroke="#fff3cf" stroke-opacity=".7" stroke-width="2"/>
+<text x="${W / 2}" y="${ctaY + ctaH / 2 + 12}" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="36" font-weight="700" fill="${c.ctaInk}">${e(spec.cta.trim())}</text>
+</svg>`;
+}
+function caption(spec) {
+    const place = [spec.city.trim(), spec.region.trim()].filter(Boolean).join(", ");
+    const tagCity = spec.city.replace(/[^A-Za-z0-9]/g, "");
+    const tagNiche = NICHES[spec.niche].label.replace(/[^A-Za-z0-9]/g, "");
+    return [
+        `${spec.setup.trim()} ${spec.payoff.trim()}`,
+        `${spec.serviceLine.trim()}${place ? ` in ${place}` : ""}.`,
+        `${spec.cta.trim()}: message ${spec.business.trim() || "us"} today.`,
+        [tagCity && `#${tagCity}`, tagNiche && `#${tagNiche}`, tagCity && `#${tagCity}SmallBusiness`].filter(Boolean).join(" "),
+    ].join("\n\n");
+}
+/**
+ * Email draft for the free-post play. The person sends it from their own email app and attaches
+ * the downloaded image; Tay does not send anything. US commercial email needs a real postal
+ * address and a way to opt out, so both are part of the draft.
+ */
+function outreachEmail(input) {
+    const prospect = input.prospect.trim() || "your business";
+    const missing = [
+        !input.prospect.trim() && "their business name",
+        !input.senderName.trim() && "your name",
+        !input.senderBusiness.trim() && "your business name",
+        !input.senderAddress.trim() && "your mailing address (US law requires one on business email)",
+    ].filter(Boolean);
+    const hello = input.contactName.trim() ? `Hi ${input.contactName.trim()},` : "Hi there,";
+    const body = [
+        hello,
+        `I'm ${input.senderName.trim() || "[your name]"} with ${input.senderBusiness.trim() || "[your business]"}. I made this social post for ${prospect}. It's attached, and it's yours to use for free, no strings.`,
+        "If you like it, I can make a few more each month so your page stays active while you're out doing the work. Want me to send two more ideas?",
+        "Either way, the post is yours.",
+        `${input.senderName.trim() || "[your name]"}\n${input.senderBusiness.trim() || "[your business]"}\n${input.senderAddress.trim() || "[your mailing address]"}`,
+        "Not interested? Reply \"no thanks\" and I won't follow up.",
+    ].join("\n\n");
+    return { subject: `A free social post I made for ${prospect}`, body, missing };
+}
+function mailtoLink(to, draft) {
+    const addr = /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(to.trim()) ? to.trim() : "";
+    return `mailto:${encodeURIComponent(addr)}?subject=${encodeURIComponent(draft.subject)}&body=${encodeURIComponent(draft.body)}`;
+}
+function fileName(spec) {
+    const slug = `${spec.business}-${spec.city}-${spec.format}`.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    return `${slug || "free-post"}.png`;
+}
+function emptyFreePost() {
+    return { mode: "mine", spec: presetSpec("hallway-cleaning"), outreach: { prospect: "", contactName: "", senderName: "", senderBusiness: "", senderAddress: "", to: "" }, headlineIndex: 0 };
+}
+const str = (v, max = 200) => (typeof v === "string" ? v.slice(0, max) : "");
+/** Validates saved state. The photo is never saved, so it can't fill device storage. */
+function parseFreePost(raw) {
+    const base = emptyFreePost();
+    if (!raw || typeof raw !== "object")
+        return base;
+    const r = raw;
+    const s = (r.spec && typeof r.spec === "object" ? r.spec : {});
+    const o = (r.outreach && typeof r.outreach === "object" ? r.outreach : {});
+    const pick = (v, allowed, d) => (allowed.includes(v) ? v : d);
+    return {
+        mode: pick(r.mode, ["mine", "outreach"], "mine"),
+        headlineIndex: Number.isInteger(r.headlineIndex) ? Math.max(0, Number(r.headlineIndex)) : 0,
+        spec: {
+            business: str(s.business, 80), city: str(s.city, 60), region: str(s.region, 30),
+            niche: pick(s.niche, Object.keys(NICHES), base.spec.niche),
+            setup: str(s.setup, 60) || base.spec.setup, payoff: str(s.payoff, 60) || base.spec.payoff,
+            serviceLine: str(s.serviceLine, 120), cta: str(s.cta, 60) || base.spec.cta,
+            format: pick(s.format, Object.keys(FORMATS), "square"),
+            palette: pick(s.palette, Object.keys(PALETTES), "cream-gold"),
+        },
+        outreach: {
+            prospect: str(o.prospect, 80), contactName: str(o.contactName, 60), senderName: str(o.senderName, 60),
+            senderBusiness: str(o.senderBusiness, 80), senderAddress: str(o.senderAddress, 160), to: str(o.to, 120),
+        },
+    };
+}
+
+(function(){
+  var KEY="pb-post-maker-v1", DEFAULT_PRESET="powerblade", DEFAULT_PALETTE="forest-cream";
+  var $=function(id){return document.getElementById(id)};
+  var state; try{state=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){state=null}
+  var spec;
+  if(state&&state.spec){spec=parseFreePost({spec:state.spec}).spec}else{spec=presetSpec(DEFAULT_PRESET);spec.palette=DEFAULT_PALETTE}
+  var idx=0, photo="", bigUrl="";
+  function fill(sel,obj,lab){sel.innerHTML=Object.keys(obj).map(function(k){return '<option value="'+k+'">'+escapeXml(lab(obj[k]))+'</option>'}).join("")}
+  fill($("niche"),NICHES,function(n){return n.label});fill($("format"),FORMATS,function(f){return f.label});fill($("palette"),PALETTES,function(p){return p.label});
+  $("formula").innerHTML=POST_FORMULA.filter(function(p){return p.id!=="free-post-play"}).map(function(p){return "<li><b>"+escapeXml(p.name)+".</b> "+escapeXml(p.what)+" <span>"+escapeXml(p.why)+"</span></li>"}).join("");
+  var fields=["business","city","region","niche","setup","payoff","serviceLine","cta","format","palette"];
+  function toForm(){fields.forEach(function(f){$(f).value=spec[f]});var k=NICHES[spec.niche];$("svc").innerHTML=k.serviceLines.map(function(s){return '<option value="'+escapeXml(s)+'">'}).join("");$("ctas").innerHTML=k.ctas.map(function(s){return '<option value="'+escapeXml(s)+'">'}).join("")}
+  function toast(t){var el=$("toast");el.textContent=t;el.style.display="block";clearTimeout(toast.t);toast.t=setTimeout(function(){el.style.display="none"},2600)}
+  function current(){var s=Object.assign({},spec);if(photo)s.photo=photo;return s}
+  function render(){
+    try{localStorage.setItem(KEY,JSON.stringify({spec:spec}))}catch(e){}
+    var s=current(),svg=renderPostSVG(s);
+    $("preview").src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg);
+    $("preview").alt="Post preview: "+s.setup+" "+s.payoff+" "+s.serviceLine+". "+s.cta+".";
+    var c=checkPost(s);
+    $("checks").innerHTML=c.length?c.map(function(x){return '<li class="'+x.level+'">'+escapeXml(x.text)+"</li>"}).join(""):'<li class="ok">Ready to post.</li>';
+    $("tip").textContent=NICHES[s.niche].photoTip+" Photos stay on this phone.";
+    $("nophoto").hidden=!photo;
+  }
+  fields.forEach(function(f){$(f).addEventListener("input",function(e){
+    if(f==="niche"){var k=NICHES[e.target.value];idx=0;spec.niche=e.target.value;spec.setup=k.headlines[0][0];spec.payoff=k.headlines[0][1];spec.cta=k.ctas[0];toForm()}
+    else spec[f]=f==="region"?e.target.value.toUpperCase().slice(0,3):e.target.value;
+    render();
+  })});
+  $("next").onclick=function(){var k=NICHES[spec.niche];idx=(idx+1)%k.headlines.length;spec.setup=k.headlines[idx][0];spec.payoff=k.headlines[idx][1];toForm();render()};
+  $("photo").onchange=function(e){var f=e.target.files&&e.target.files[0];if(!f)return;if(!/^image\/(png|jpeg|webp)$/.test(f.type)){toast("Use a JPG, PNG or WebP photo.");return}if(f.size>6*1024*1024){toast("That photo is over 6 MB.");return}var r=new FileReader();r.onload=function(){photo=String(r.result);render()};r.readAsDataURL(f)};
+  $("nophoto").onclick=function(){photo="";render()};
+  $("cap").onclick=function(){var t=caption(current());(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){toast("Caption copied")},function(){prompt("Copy the caption:",t)})};
+  function inApp(){try{return !!(window.Capacitor||(window.parent!==window&&window.parent.Capacitor))}catch(e){return false}}
+  function showBig(b){if(bigUrl)URL.revokeObjectURL(bigUrl);bigUrl=URL.createObjectURL(b);$("bigimg").src=bigUrl;$("big").hidden=false;$("bigdone").focus()}
+  $("bigdone").onclick=function(){$("big").hidden=true;$("dl").focus()};
+  function deliver(b,s){
+    if(inApp()){
+      var file=null;try{file=new File([b],fileName(s),{type:"image/png"})}catch(e){}
+      if(file&&navigator.canShare&&navigator.canShare({files:[file]})){navigator.share({files:[file]}).catch(function(){});return}
+      showBig(b);return;
+    }
+    var a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=fileName(s);document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},4000);toast("Picture saved");
+  }
+  $("dl").onclick=function(){
+    var s=current(),f=FORMATS[s.format],url=URL.createObjectURL(new Blob([renderPostSVG(s)],{type:"image/svg+xml"})),img=new Image();
+    img.onload=function(){var c=document.createElement("canvas");c.width=f.width;c.height=f.height;c.getContext("2d").drawImage(img,0,0,f.width,f.height);URL.revokeObjectURL(url);
+      c.toBlob(function(b){if(!b){toast("Couldn't make the picture here.");return}deliver(b,s)},"image/png")};
+    img.onerror=function(){toast("Couldn't make the picture here.")};img.src=url;
+  };
+  toForm();render();
+})();
+</script>
+</body>
+</html>
