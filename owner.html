@@ -119,7 +119,7 @@ nav svg{width:26px;height:26px}
 .sheet{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.55);display:flex;align-items:flex-end}
 .sheet .panel{background:var(--bg);width:100%;max-height:94%;overflow:auto;border-radius:16px 16px 0 0;padding-block:8px calc(20px + env(safe-area-inset-bottom,0px))}
 .morebox{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.morebox button{min-height:90px;flex-direction:column;font-size:17px}
+.morebox button,.morebox a{min-height:90px;flex-direction:column;font-size:17px}
 @media (max-width:440px){.grid2{grid-template-columns:1fr}.item{grid-template-columns:1fr 70px 84px 44px}.stat b{font-size:26px}}
 </style>
 
@@ -368,6 +368,7 @@ function vMore(){
   return `<h2>Tools</h2><div class="morebox">
     <button data-act="go" data-v="quote"><span style="font-size:30px">🧾</span>Estimate builder</button>
     <button data-act="go" data-v="site"><span style="font-size:30px">🖼️</span>Website editor</button>
+    <a class="btn" href="post-maker.html"><span style="font-size:30px">📣</span>Post maker</a>
     <button data-act="go" data-v="crew"><span style="font-size:30px">👷🏾</span>Crew</button>
     <button data-act="go" data-v="texts"><span style="font-size:30px">💬</span>Text templates</button>
     <button data-act="go" data-v="equip"><span style="font-size:30px">🔧</span>Equipment</button>
